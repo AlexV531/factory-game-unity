@@ -165,7 +165,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2994412009
+  GlobalObjectIdHash: 2386474893
   InScenePlacedSourceGlobalObjectIdHash: 2386474893
   DeferredDespawnTick: 0
   Ownership: 1
@@ -199,10 +199,8 @@ MonoBehaviour:
   groundLayer:
     serializedVersion: 2
     m_Bits: 192
-  playerCamera: {fileID: 0}
   cameraRoot: {fileID: 3091062813587992435}
   mouseSensitivity: 0.1
-  audioListener: {fileID: 0}
 --- !u!54 &2300158606108709344
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -227,7 +225,7 @@ Rigidbody:
   m_ImplicitTensor: 1
   m_UseGravity: 1
   m_IsKinematic: 0
-  m_Interpolate: 1
+  m_Interpolate: 0
   m_Constraints: 112
   m_CollisionDetection: 2
 --- !u!114 &5453086930949067390
@@ -354,6 +352,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CameraSetup
   cinemachineCamera: {fileID: 0}
+  normalCamera: {fileID: 0}
   target: {fileID: 3091062813587992435}
 --- !u!1 &4680196624574217665
 GameObject:

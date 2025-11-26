@@ -71,6 +71,22 @@ public class PhysicsPlayerController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
+        HandleMouseLook();
+
+        // Jump input
+        if (jumpInput && isGrounded)
+        {
+            Jump();
+            jumpInput = false;
+        }
+
+        // Unlock cursor with Escape
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            Cursor.lockState = CursorLockMode.None;
+            Cursor.visible = true;
+        }
+
         CheckGrounded();
         HandleMovement();
     }

@@ -4,6 +4,7 @@ using UnityEngine;
 public class PlayerCameraConnector : MonoBehaviour
 {
     public CinemachineCamera cinemachineCamera;
+    public CameraFollowRoot normalCamera;
     public Transform target;
 
     void Start()
@@ -13,11 +14,20 @@ public class PlayerCameraConnector : MonoBehaviour
             cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
         }
 
+        if (normalCamera == null)
+        {
+            normalCamera = FindAnyObjectByType<CameraFollowRoot>();
+        }
+
         if (cinemachineCamera != null && target != null)
         {
             cinemachineCamera.Target.TrackingTarget = target;
             cinemachineCamera.Follow = target;
             cinemachineCamera.LookAt = target;
+        }
+        else if (normalCamera != null && target != null)
+        {
+            normalCamera.SetTarget(target);
         }
     }
 }
