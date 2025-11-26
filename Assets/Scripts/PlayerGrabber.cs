@@ -4,6 +4,7 @@ using UnityEngine.InputSystem;
 public class PlayerGrabber : MonoBehaviour
 {
     public Transform grabPoint; // Position where object is held
+    public Transform cameraRoot;
     public float grabDistance = 3f;
     public LayerMask grabbableLayer;
 
@@ -25,8 +26,7 @@ public class PlayerGrabber : MonoBehaviour
     {
         Debug.Log("Try grab");
         RaycastHit hit;
-        if (Physics.Raycast(Camera.main.transform.position, 
-            Camera.main.transform.forward, out hit, grabDistance, grabbableLayer))
+        if (Physics.Raycast(cameraRoot.position, cameraRoot.forward, out hit, grabDistance, grabbableLayer))
         {
             Debug.Log("Grabbable object interacted with");
             GrabbableObject grobject = hit.collider.GetComponent<GrabbableObject>();

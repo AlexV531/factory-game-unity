@@ -15,12 +15,8 @@ public class PhysicsPlayerController : NetworkBehaviour
     public LayerMask groundLayer;
 
     [Header("Camera")]
-    public Camera playerCamera;
     public Transform cameraRoot;
     public float mouseSensitivity = 2f;
-
-    [Header("Audio Listener")]
-    public AudioListener audioListener;
 
     private Rigidbody rb;
     private CapsuleCollider capsuleCollider;
@@ -43,7 +39,6 @@ public class PhysicsPlayerController : NetworkBehaviour
         rb = GetComponent<Rigidbody>();
         capsuleCollider = GetComponent<CapsuleCollider>();
 
-        // Important rigidbody settings for physics character
         rb.maxAngularVelocity = 7f; // Prevent excessive spinning
 
         // Lock and hide cursor

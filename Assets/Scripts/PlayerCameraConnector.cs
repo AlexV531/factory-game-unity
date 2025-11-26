@@ -1,16 +1,23 @@
-using Unity.Netcode;
+using Unity.Cinemachine;
 using UnityEngine;
-// using Cinemachine;
 
-public class PlayerCameraConnector : NetworkBehaviour
+public class PlayerCameraConnector : MonoBehaviour
 {
-    public Transform cameraRoot;
+    public CinemachineCamera cinemachineCamera;
+    public Transform target;
 
-    public override void OnNetworkSpawn()
+    void Start()
     {
-        if (!IsOwner) return;
+        if (cinemachineCamera == null)
+        {
+            cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
+        }
 
-        // var vcam = GameObject.FindAnyObjectByType<CinemachineCamera>();
-        // vcam.TrackingTarget.Target = cameraRoot;
+        if (cinemachineCamera != null && target != null)
+        {
+            cinemachineCamera.Target.TrackingTarget = target;
+            cinemachineCamera.Follow = target;
+            cinemachineCamera.LookAt = target;
+        }
     }
 }
