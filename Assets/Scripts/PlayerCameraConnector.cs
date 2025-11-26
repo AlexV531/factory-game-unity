@@ -1,7 +1,8 @@
 using Unity.Cinemachine;
+using Unity.Netcode;
 using UnityEngine;
 
-public class PlayerCameraConnector : MonoBehaviour
+public class PlayerCameraConnector : NetworkBehaviour
 {
     public CinemachineCamera cinemachineCamera;
     public CameraFollowRoot normalCamera;
@@ -9,6 +10,8 @@ public class PlayerCameraConnector : MonoBehaviour
 
     void Start()
     {
+        if (!IsOwner) return;
+
         if (cinemachineCamera == null)
         {
             cinemachineCamera = FindAnyObjectByType<CinemachineCamera>();
