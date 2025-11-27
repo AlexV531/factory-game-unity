@@ -50,7 +50,6 @@ public class Machine : NetworkBehaviour
 
     public bool IsOperational()
     {
-        Debug.Log("PoweredOn: " + PoweredOn.Value + "assemblyLineManager.IsLineRunning(): " + assemblyLineManager.IsLineRunning());
         return PoweredOn.Value && assemblyLineManager.IsLineRunning();
     }
 
