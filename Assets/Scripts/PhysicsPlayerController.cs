@@ -62,6 +62,8 @@ public class PhysicsPlayerController : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         if (IsOwner)
         {
             LocalPlayer = this;

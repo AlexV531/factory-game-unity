@@ -5,31 +5,33 @@ using System.Collections;
 public class AssemblyLineManager : NetworkBehaviour
 {
     [SerializeField] private float rampUpTime = 3f; // Time to reach full speed
-    
+
     private ConveyorBelt[] conveyorBelts;
     private float[] targetSpeeds; // Store each belt's original speed
     private bool isRampingUp = false;
     private bool beltsRunning = true;
+
+    private Machine[] machines; // Track all machines
 
     private void Start()
     {
         // Find all conveyor belts in the scene
         conveyorBelts = FindObjectsByType<ConveyorBelt>(FindObjectsSortMode.None);
         targetSpeeds = new float[conveyorBelts.Length];
-        
-        // Store their initial speeds
+
         for (int i = 0; i < conveyorBelts.Length; i++)
         {
             targetSpeeds[i] = conveyorBelts[i].GetCurrentSpeed();
         }
-        
-        Debug.Log($"AssemblyLineManager found {conveyorBelts.Length} conveyor belts");
+
+        // Find all machines in the scene
+        machines = FindObjectsByType<Machine>(FindObjectsSortMode.None);
+
+        Debug.Log($"AssemblyLineManager found {conveyorBelts.Length} belts and {machines.Length} machines");
     }
 
     public void ToggleBelts()
     {
-        Debug.Log("Toggling belts");
-
         if (beltsRunning)
         {
             StopAllBelts();
@@ -40,14 +42,13 @@ public class AssemblyLineManager : NetworkBehaviour
         }
     }
 
-    // Stop all belts immediately
     public void StopAllBelts()
     {
         if (!IsServer) return;
 
         StopAllCoroutines();
         isRampingUp = false;
-        
+
         foreach (ConveyorBelt belt in conveyorBelts)
         {
             if (belt != null)
@@ -57,14 +58,20 @@ public class AssemblyLineManager : NetworkBehaviour
         }
 
         beltsRunning = false;
-        
+
         Debug.Log("All conveyor belts stopped");
     }
 
-    // Start all belts with gradual ramp up
     public void StartAllBelts()
     {
         if (!IsServer) return;
+
+        // Check all machines are powered on before starting
+        if (AnyMachinePoweredOff())
+        {
+            Debug.LogWarning("Cannot start assembly line: some machines are powered off");
+            return;
+        }
 
         if (!isRampingUp)
         {
@@ -72,14 +79,25 @@ public class AssemblyLineManager : NetworkBehaviour
         }
 
         beltsRunning = true;
+        Debug.Log("Assembly line starting...");
+    }
 
-        Debug.Log("All conveyor belts stopped");
+    private bool AnyMachinePoweredOff()
+    {
+        foreach (Machine machine in machines)
+        {
+            if (machine != null && !machine.IsPoweredOn())
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     private IEnumerator RampUpBelts()
     {
         isRampingUp = true;
-        
+
         // Start all belts at speed 0
         for (int i = 0; i < conveyorBelts.Length; i++)
         {
@@ -89,18 +107,15 @@ public class AssemblyLineManager : NetworkBehaviour
                 conveyorBelts[i].StartBelt();
             }
         }
-        
+
         float elapsed = 0f;
-        
-        // Gradually increase speed over rampUpTime
+
         while (elapsed < rampUpTime)
         {
             elapsed += Time.deltaTime;
             float t = elapsed / rampUpTime;
-            
-            // Use smoothstep for smoother acceleration
             float smoothT = t * t * (3f - 2f * t);
-            
+
             for (int i = 0; i < conveyorBelts.Length; i++)
             {
                 if (conveyorBelts[i] != null)
@@ -109,10 +124,10 @@ public class AssemblyLineManager : NetworkBehaviour
                     conveyorBelts[i].SetSpeed(currentSpeed);
                 }
             }
-            
+
             yield return null;
         }
-        
+
         // Ensure we hit exact target speeds
         for (int i = 0; i < conveyorBelts.Length; i++)
         {
@@ -121,35 +136,28 @@ public class AssemblyLineManager : NetworkBehaviour
                 conveyorBelts[i].SetSpeed(targetSpeeds[i]);
             }
         }
-        
+
         isRampingUp = false;
         Debug.Log("All conveyor belts at full speed");
     }
 
-    // RPC versions for clients to call
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StopAllBeltsServerRpc()
-    {
-        StopAllBelts();
-    }
-
-    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
-    public void StartAllBeltsServerRpc()
-    {
-        StartAllBelts();
-    }
-
-    // Utility method to refresh the list of belts (if belts are added/removed dynamically)
-    public void RefreshBeltList()
+    // Optional: refresh lists dynamically
+    public void RefreshBeltAndMachineList()
     {
         if (!IsServer) return;
 
         conveyorBelts = FindObjectsByType<ConveyorBelt>(FindObjectsSortMode.None);
         targetSpeeds = new float[conveyorBelts.Length];
-        
         for (int i = 0; i < conveyorBelts.Length; i++)
         {
             targetSpeeds[i] = conveyorBelts[i].GetCurrentSpeed();
         }
+
+        machines = FindObjectsByType<Machine>(FindObjectsSortMode.None);
+    }
+
+    public bool IsLineRunning()
+    {
+        return beltsRunning;
     }
 }

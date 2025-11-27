@@ -17,6 +17,7 @@ GameObject:
   - component: {fileID: 1471538202172852021}
   - component: {fileID: 3581846204943940505}
   - component: {fileID: 1603877916484068389}
+  - component: {fileID: 2239836110167024736}
   m_Layer: 7
   m_Name: Box
   m_TagString: Untagged
@@ -155,7 +156,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 4141301350
+  GlobalObjectIdHash: 3201462553
   InScenePlacedSourceGlobalObjectIdHash: 3201462553
   DeferredDespawnTick: 0
   Ownership: 1
@@ -249,3 +250,16 @@ MonoBehaviour:
   UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
+--- !u!114 &2239836110167024736
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7742154222114726815}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0b536e9bafe046542956c48963ea1aef, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Product
+  productCode: 0

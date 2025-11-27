@@ -151,10 +151,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ConveyorBelt
   ShowTopMostFoldoutHeaderGroup: 1
-  speed: 2
+  speed: 1
   direction: {x: 0, y: 0, z: 1}
   isRunning: 1
-  conveyorCollider: {fileID: 7704322292897974011}
 --- !u!1 &8593535524769873549
 GameObject:
   m_ObjectHideFlags: 0

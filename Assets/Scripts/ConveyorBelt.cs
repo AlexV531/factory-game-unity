@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 public class ConveyorBelt : NetworkBehaviour
 {
-    [SerializeField] private float speed = 2f;
+    [SerializeField] private float speed = 1f;
     [SerializeField] private Vector3 direction = Vector3.forward;
     [SerializeField] private bool isRunning = true;
 

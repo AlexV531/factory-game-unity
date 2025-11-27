@@ -29,6 +29,8 @@ public class GrabbableObject : NetworkBehaviour
 
     public override void OnNetworkSpawn()
     {
+        base.OnNetworkSpawn();
+
         if (rb != null)
         {
             originalLinearDamping = rb.linearDamping;

@@ -44,7 +44,7 @@ public class ObjectSpawner : NetworkBehaviour
         }
     }
 
-    private void SpawnObject()
+    public void SpawnObject()
     {
         if (prefabToSpawn == null)
         {
