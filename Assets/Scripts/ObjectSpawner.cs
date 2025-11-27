@@ -46,7 +46,6 @@ public class ObjectSpawner : NetworkBehaviour
 
     private void SpawnObject()
     {
-        Debug.Log("Attempting spawn");
         if (prefabToSpawn == null)
         {
             Debug.LogWarning("No prefab assigned to NetworkObjectSpawner!");

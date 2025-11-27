@@ -6,14 +6,14 @@ public class WebcamStreamer : NetworkBehaviour
 {
     [SerializeField] private Renderer targetRenderer;
     
-    // Very low settings for minimal bandwidth
-    [SerializeField] private int textureWidth = 160;
-    [SerializeField] private int textureHeight = 120;
+    // Target low resolution for streaming
+    [SerializeField] private int targetWidth = 160;
+    [SerializeField] private int targetHeight = 120;
     [SerializeField] private int fps = 10;
     [SerializeField] private int jpgQuality = 25; // Very low quality
     
     private WebCamTexture webCamTexture;
-    private Texture2D tempTexture;
+    private Texture2D downscaledTexture;
     private Texture2D displayTexture;
     private bool isStreaming = false;
 
@@ -22,11 +22,6 @@ public class WebcamStreamer : NetworkBehaviour
         if (IsOwner)
         {
             StartWebcam();
-        }
-        else
-        {
-            // Display texture will be created when we receive first frame
-            // This allows us to match the sender's actual resolution
         }
     }
 
@@ -58,11 +53,11 @@ public class WebcamStreamer : NetworkBehaviour
             deviceIndex = 0;
         }
 
-        // Request the lowest resolution from webcam
-        webCamTexture = new WebCamTexture(devices[deviceIndex].name, textureWidth, textureHeight, fps);
+        // Request low resolution (webcam may ignore this and give higher res)
+        webCamTexture = new WebCamTexture(devices[deviceIndex].name, targetWidth, targetHeight, fps);
         webCamTexture.Play();
         
-        // Wait for webcam to start and get actual resolution
+        // Wait for webcam to start
         StartCoroutine(InitializeWebcam());
     }
     
@@ -71,17 +66,18 @@ public class WebcamStreamer : NetworkBehaviour
         // Wait for webcam to actually start
         yield return new WaitUntil(() => webCamTexture.width > 16);
         
-        // Use the actual webcam resolution (it might differ from what we requested)
         int actualWidth = webCamTexture.width;
         int actualHeight = webCamTexture.height;
         
-        Debug.Log($"Requested: {textureWidth}x{textureHeight}, Actual: {actualWidth}x{actualHeight}");
+        Debug.Log($"Webcam actual resolution: {actualWidth}x{actualHeight}");
+        Debug.Log($"Will downscale to: {targetWidth}x{targetHeight}");
         
-        // Create texture with actual resolution
-        tempTexture = new Texture2D(actualWidth, actualHeight, TextureFormat.RGB24, false);
+        // Create downscaled texture at our target resolution
+        downscaledTexture = new Texture2D(targetWidth, targetHeight, TextureFormat.RGB24, false);
+        downscaledTexture.filterMode = FilterMode.Bilinear;
         
-        // Display own webcam locally
-        targetRenderer.material.mainTexture = webCamTexture;
+        // Display own webcam locally (downscaled version)
+        targetRenderer.material.mainTexture = downscaledTexture;
         
         isStreaming = true;
         StartCoroutine(StreamWebcam());
@@ -91,21 +87,46 @@ public class WebcamStreamer : NetworkBehaviour
     {
         while (isStreaming)
         {
-            if (webCamTexture.didUpdateThisFrame)
-            {
-                // Copy webcam to Texture2D
-                tempTexture.SetPixels(webCamTexture.GetPixels());
-                tempTexture.Apply();
-                
-                // Encode with very low quality - results in ~5-15 KB per frame
-                byte[] imageData = tempTexture.EncodeToJPG(jpgQuality);
-                
-                // Send to other players
-                SendWebcamDataServerRpc(imageData);
-            }
+            // Always send at our target framerate, don't wait for didUpdateThisFrame
+            // Downscale the webcam texture to target resolution
+            DownscaleTexture(webCamTexture, downscaledTexture);
+            
+            // Encode with very low quality
+            byte[] imageData = downscaledTexture.EncodeToJPG(jpgQuality);
+            
+            // Send to other players
+            SendWebcamDataServerRpc(imageData);
             
             yield return new WaitForSeconds(1f / fps);
         }
+    }
+    
+    void DownscaleTexture(WebCamTexture source, Texture2D destination)
+    {
+        // Get pixels from source
+        Color[] sourcePixels = source.GetPixels();
+        Color[] destPixels = new Color[destination.width * destination.height];
+        
+        float xRatio = (float)source.width / destination.width;
+        float yRatio = (float)source.height / destination.height;
+        
+        // Simple nearest-neighbor downscaling (fast)
+        for (int y = 0; y < destination.height; y++)
+        {
+            for (int x = 0; x < destination.width; x++)
+            {
+                int sourceX = Mathf.FloorToInt(x * xRatio);
+                int sourceY = Mathf.FloorToInt(y * yRatio);
+                
+                int sourceIndex = sourceY * source.width + sourceX;
+                int destIndex = y * destination.width + x;
+                
+                destPixels[destIndex] = sourcePixels[sourceIndex];
+            }
+        }
+        
+        destination.SetPixels(destPixels);
+        destination.Apply();
     }
 
     [ServerRpc]
@@ -123,12 +144,12 @@ public class WebcamStreamer : NetworkBehaviour
             // Create display texture on first frame if needed
             if (displayTexture == null)
             {
-                displayTexture = new Texture2D(2, 2); // Will auto-resize on LoadImage
+                displayTexture = new Texture2D(targetWidth, targetHeight);
                 displayTexture.filterMode = FilterMode.Bilinear;
                 targetRenderer.material.mainTexture = displayTexture;
             }
             
-            // Decode and display - LoadImage automatically resizes the texture
+            // Decode and display
             displayTexture.LoadImage(data);
             displayTexture.Apply();
         }
@@ -163,8 +184,6 @@ public class WebcamStreamer : NetworkBehaviour
         
         // Start new camera
         StartWebcam(deviceIndex);
-        isStreaming = true;
-        StartCoroutine(StreamWebcam());
     }
 
     // Optional: Toggle streaming on/off
