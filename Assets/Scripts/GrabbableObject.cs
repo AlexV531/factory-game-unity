@@ -9,6 +9,7 @@ public class GrabbableObject : NetworkBehaviour
     public float dampingMultiplier = 10f;
     public float maxGrabForce = 100f;
     public float dragWhenGrabbed = 5f;
+    public float maxGrabDistance = 2f; // Auto-release if beyond this distance
 
     // Network list of grabber client IDs
     private NetworkList<ulong> grabberClientIds;
@@ -97,7 +98,7 @@ public class GrabbableObject : NetworkBehaviour
         if (NetworkManager.Singleton.LocalClientId != clientId) return;
 
         // Find the local player's grabber component
-        PlayerGrabber[] grabbers = FindObjectsByType<PlayerGrabber>(FindObjectsSortMode.None);
+        PlayerInteracter[] grabbers = FindObjectsByType<PlayerInteracter>(FindObjectsSortMode.None);
         foreach (var grabber in grabbers)
         {
             if (grabber.IsOwner)
@@ -115,7 +116,7 @@ public class GrabbableObject : NetworkBehaviour
         if (NetworkManager.Singleton.LocalClientId != clientId) return;
 
         // Find the local player's grabber component
-        PlayerGrabber[] grabbers = FindObjectsByType<PlayerGrabber>(FindObjectsSortMode.None);
+        PlayerInteracter[] grabbers = FindObjectsByType<PlayerInteracter>(FindObjectsSortMode.None);
         foreach (var grabber in grabbers)
         {
             if (grabber.IsOwner)
@@ -136,6 +137,7 @@ public class GrabbableObject : NetworkBehaviour
             // Average the target positions of all grabbers
             Vector3 averageTarget = Vector3.zero;
             int validGrabPoints = 0;
+            List<ulong> grabbersToRemove = new List<ulong>();
 
             foreach (var clientId in grabberClientIds)
             {
@@ -143,10 +145,31 @@ public class GrabbableObject : NetworkBehaviour
                 {
                     if (grabPoint != null)
                     {
-                        averageTarget += grabPoint.position;
-                        validGrabPoints++;
+                        float distance = Vector3.Distance(grabPoint.position, transform.position);
+
+                        // Check if too far - mark for removal
+                        if (distance > maxGrabDistance)
+                        {
+                            grabbersToRemove.Add(clientId);
+                        }
+                        else
+                        {
+                            averageTarget += grabPoint.position;
+                            validGrabPoints++;
+                        }
+                    }
+                    else
+                    {
+                        // Grab point no longer exists, remove grabber
+                        grabbersToRemove.Add(clientId);
                     }
                 }
+            }
+
+            // Remove grabbers that are too far or invalid
+            foreach (var clientId in grabbersToRemove)
+            {
+                RemoveGrabber(clientId);
             }
 
             if (validGrabPoints > 0)

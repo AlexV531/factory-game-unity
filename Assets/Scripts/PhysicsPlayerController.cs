@@ -17,6 +17,7 @@ public class PhysicsPlayerController : NetworkBehaviour
     [Header("Camera")]
     public Transform cameraRoot;
     public float mouseSensitivity = 2f;
+    public WebcamStreamer webcamStreamer;
 
     private Rigidbody rb;
     private CapsuleCollider capsuleCollider;
@@ -27,6 +28,20 @@ public class PhysicsPlayerController : NetworkBehaviour
     private Vector2 moveInput;
     private Vector2 lookInput;
     private bool jumpInput;
+    private bool pauseInput;
+
+    // UI variables
+    private PauseMenu pauseMenu;
+
+    public static PhysicsPlayerController LocalPlayer { get; private set; }
+
+    void Awake()
+	{
+        if (pauseMenu == null)
+		{
+			pauseMenu = GameObject.FindGameObjectWithTag("UserInterface").GetComponent<PauseMenu>();
+		}
+    }
 
     void Start()
     {
@@ -42,13 +57,24 @@ public class PhysicsPlayerController : NetworkBehaviour
         rb.maxAngularVelocity = 7f; // Prevent excessive spinning
 
         // Lock and hide cursor
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        CursorManager.SetCursorActive(false);
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        if (IsOwner)
+        {
+            LocalPlayer = this;
+        }
     }
 
     void Update()
     {
         if (!IsOwner) return;
+
+        HandleMenus();
+
+        if (IsPlayerInMenu()) return;
 
         HandleMouseLook();
 
@@ -71,14 +97,7 @@ public class PhysicsPlayerController : NetworkBehaviour
     {
         if (!IsOwner) return;
 
-        HandleMouseLook();
-
-        // Jump input
-        if (jumpInput && isGrounded)
-        {
-            Jump();
-            jumpInput = false;
-        }
+        if (IsPlayerInMenu()) return;
 
         // Unlock cursor with Escape
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -138,6 +157,33 @@ public class PhysicsPlayerController : NetworkBehaviour
         }
     }
 
+    void HandleMenus()
+	{
+        if (pauseMenu.IsMenuOpen()) // Pause menu open
+		{
+			if (pauseInput)
+			{
+				pauseMenu.CloseMenu();
+				pauseInput = false;
+			}
+		}
+		else // No menus open
+		{
+			if (pauseInput)
+			{
+				pauseMenu.OpenMenu();
+				pauseInput = false;
+			}
+        }
+    }
+
+    bool IsPlayerInMenu()
+    {
+        if (pauseMenu.IsMenuOpen())
+            return true;
+        return false;
+    }
+
     void Jump()
     {
         rb.AddForce(Vector3.up * jumpForce, ForceMode.Impulse);
@@ -164,6 +210,11 @@ public class PhysicsPlayerController : NetworkBehaviour
     public void OnJump(InputValue value)
     {
         jumpInput = value.isPressed;
+    }
+
+    public void OnPause(InputValue value)
+    {
+        pauseInput = value.isPressed;
     }
 
     // Optional: Visual debug for ground check

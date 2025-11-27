@@ -2,13 +2,12 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using Unity.Netcode;
 
-public class PlayerGrabber : NetworkBehaviour
+public class PlayerInteracter : NetworkBehaviour
 {
     public Transform grabPoint;
     public Transform cameraRoot;
     public float grabDistance = 3f;
-    public LayerMask grabbableLayer;
-
+    public LayerMask interactableLayer;
     private GrabbableObject grabbedObject;
 
     public void OnInteract(InputValue value)
@@ -28,19 +27,30 @@ public class PlayerGrabber : NetworkBehaviour
 
     void TryGrab()
     {
-        Debug.Log("Try grab");
         RaycastHit hit;
-        if (Physics.Raycast(cameraRoot.position, cameraRoot.forward, out hit, grabDistance, grabbableLayer))
+        if (Physics.Raycast(cameraRoot.position, cameraRoot.forward, out hit, grabDistance, interactableLayer))
         {
-            Debug.Log("Grabbable object interacted with");
+            Debug.Log("Object interacted with");
+            
+            // First check for GrabbableObject
             GrabbableObject grobject = hit.collider.GetComponent<GrabbableObject>();
             if (grobject != null)
             {
                 Debug.Log("Grabbable object component found");
                 grabbedObject = grobject;
-
                 // Request grab from server
                 RequestGrabServerRpc(grobject.NetworkObjectId);
+            }
+            else
+            {
+                // If no GrabbableObject, check for Interactable
+                Interactable interactable = hit.collider.GetComponent<Interactable>();
+                if (interactable != null)
+                {
+                    Debug.Log("Interactable component found");
+                    // Request interact from server
+                    RequestInteractServerRpc(interactable.NetworkObjectId);
+                }
             }
         }
     }
@@ -80,6 +90,20 @@ public class PlayerGrabber : NetworkBehaviour
             if (grabbable != null)
             {
                 grabbable.RemoveGrabber(OwnerClientId);
+            }
+        }
+    }
+
+    [ServerRpc]
+    void RequestInteractServerRpc(ulong objectId)
+    {
+        // Find the network object and call its Interact function
+        if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))
+        {
+            Interactable interactable = netObj.GetComponent<Interactable>();
+            if (interactable != null)
+            {
+                interactable.Interact(OwnerClientId);
             }
         }
     }
