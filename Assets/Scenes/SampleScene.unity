@@ -1234,9 +1234,9 @@ MonoBehaviour:
   SyncRotAngleX: 1
   SyncRotAngleY: 1
   SyncRotAngleZ: 1
-  SyncScaleX: 1
-  SyncScaleY: 1
-  SyncScaleZ: 1
+  SyncScaleX: 0
+  SyncScaleY: 0
+  SyncScaleZ: 0
   PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
@@ -3851,6 +3851,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+  CurrentMaterial:
+    m_InternalValue: 0
 --- !u!114 &1295106144
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15216,6 +15218,10 @@ PrefabInstance:
     - target: {fileID: 1509874956517644827, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: GlobalObjectIdHash
       value: 2410720072
+      objectReference: {fileID: 0}
+    - target: {fileID: 3243650729833697742, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
+      propertyPath: m_IsActive
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3710599602106560500, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: m_Name

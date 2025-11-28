@@ -125,8 +125,8 @@ GameObject:
   - component: {fileID: 2265629532227956631}
   - component: {fileID: 1509874956517644827}
   - component: {fileID: 2722616800184570953}
-  - component: {fileID: 6349211467553171644}
-  - component: {fileID: 6517344861406206439}
+  - component: {fileID: 4641499073967624571}
+  - component: {fileID: 8402594325060731972}
   - component: {fileID: 1601730636459082325}
   m_Layer: 8
   m_Name: Forklift
@@ -281,7 +281,7 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 2
---- !u!114 &6349211467553171644
+--- !u!114 &4641499073967624571
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -290,11 +290,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3710599602106560500}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: cae2e77ead59714459546ee90d035d89, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  m_EditorClassIdentifier: Assembly-CSharp::VehicleNetworkTransformHook
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -327,7 +327,7 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &6517344861406206439
+--- !u!114 &8402594325060731972
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -342,7 +342,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 1
-  AutoUpdateKinematicState: 1
+  AutoUpdateKinematicState: 0
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &1601730636459082325
 MonoBehaviour:
@@ -366,8 +366,8 @@ MonoBehaviour:
   forkLiftSpeed: 2
   minForkHeight: 0
   maxForkHeight: 3
-  enableClientPrediction: 1
-  predictionReconciliationSpeed: 10
+  reconciliationThreshold: 0.5
+  reconciliationSpeed: 10
 --- !u!1 &4292633675924663210
 GameObject:
   m_ObjectHideFlags: 0
