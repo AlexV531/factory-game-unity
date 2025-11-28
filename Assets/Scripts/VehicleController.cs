@@ -5,10 +5,10 @@ using Unity.Netcode;
 public class VehicleController : Interactable
 {
     [Header("Settings")]
-    public float motorForce = 15f;
-    public float turnSpeed = 100f;
-    public float maxSpeed = 20f;
-    public float minTurnSpeedFactor = 0.08f;
+    public float motorForce = 18f;
+    public float turnSpeed = 260f;
+    public float maxSpeed = 24f;
+    public float minTurnSpeedFactor = 0.1f;
 
     [Header("Entry System")]
     public Transform driverSeat;
@@ -25,7 +25,12 @@ public class VehicleController : Interactable
     private bool isBraking;
     private float forkInput;
 
-    private float currentForkHeight = 0f;
+    // private float currentForkHeight = 0f;
+    private NetworkVariable<float> ForkHeight = new NetworkVariable<float>(
+        0f,
+        NetworkVariableReadPermission.Everyone,
+        NetworkVariableWritePermission.Server
+    );
     private Vector3 forkStartPosition;
 
     private NetworkVariable<ulong> driverClientId = new NetworkVariable<ulong>(
@@ -51,6 +56,11 @@ public class VehicleController : Interactable
 
         if (forks != null)
             forkStartPosition = forks.localPosition;
+    }
+
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
     }
 
     private void OnEnable()
@@ -211,49 +221,64 @@ public class VehicleController : Interactable
     {
         if (!HasDriver()) return;
 
-        // Physics only runs on server
-        if (!IsServer) return;
-
-        float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
-
-        // Apply forward/backward force
-        if (Mathf.Abs(forwardSpeed) < maxSpeed)
-            rb.AddForce(transform.forward * moveInput.y * motorForce, ForceMode.Acceleration);
-
-        // Steering proportional to speed
-        float speedFactor = Mathf.Lerp(minTurnSpeedFactor, 1f, Mathf.InverseLerp(0f, maxSpeed, Mathf.Abs(forwardSpeed)));
-        float proportionalTurnSpeed = turnSpeed * speedFactor;
-        float targetAngularVelocity = moveInput.x * proportionalTurnSpeed * Mathf.Deg2Rad;
-
-        if (!rb.isKinematic)
-            rb.angularVelocity = new Vector3(0, targetAngularVelocity, 0);
-
-        // Braking
-        if (isBraking)
-            rb.linearVelocity *= 0.95f;
-
-        // Fork lifting
-        if (forks != null)
+        if (IsServer)
         {
-            currentForkHeight = Mathf.Clamp(
-                currentForkHeight + forkInput * forkLiftSpeed * Time.fixedDeltaTime,
-                minForkHeight,
-                maxForkHeight
-            );
+            float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
 
-            Vector3 newForkPosition = forkStartPosition;
-            newForkPosition.y += currentForkHeight;
-            forks.localPosition = newForkPosition;
+            if (Mathf.Abs(forwardSpeed) < maxSpeed)
+                rb.AddForce(transform.forward * moveInput.y * motorForce, ForceMode.Acceleration);
+
+            float speedFactor = Mathf.Lerp(minTurnSpeedFactor, 1f, Mathf.InverseLerp(0f, maxSpeed, Mathf.Abs(forwardSpeed)));
+            float proportionalTurnSpeed = turnSpeed * speedFactor;
+            float targetAngularVelocity = moveInput.x * proportionalTurnSpeed * Mathf.Deg2Rad;
+
+            if (!rb.isKinematic)
+                rb.angularVelocity = new Vector3(0, targetAngularVelocity, 0);
+
+            if (isBraking)
+                rb.linearVelocity *= 0.95f;
+
+            // Server authoritative fork movement
+            if (forks != null)
+            {
+                ForkHeight.Value = Mathf.Clamp(
+                    ForkHeight.Value + forkInput * forkLiftSpeed * Time.fixedDeltaTime,
+                    minForkHeight,
+                    maxForkHeight
+                );
+
+                // Directly move forks on server
+                Vector3 newPos = forkStartPosition;
+                newPos.y += ForkHeight.Value;
+                forks.localPosition = newPos;
+            }
         }
-    }
 
-    private void LateUpdate()
-    {
-        // Keep driver in seat position every frame
+        // Client-side smoothing of fork position
+        if (!IsServer && forks != null)
+        {
+            Vector3 targetPos = forkStartPosition;
+            targetPos.y += ForkHeight.Value;
+            forks.localPosition = Vector3.Lerp(forks.localPosition, targetPos, 10f * Time.deltaTime);
+        }
+
+        // Smoothly move driver for everyone
         if (currentDriver != null && driverSeat != null)
         {
-            currentDriver.transform.position = driverSeat.position;
-            currentDriver.transform.rotation = driverSeat.rotation;
+            float smoothSpeed = 15f;
+            float rotationSpeed = 1f;
+
+            currentDriver.transform.position = Vector3.Lerp(
+                currentDriver.transform.position,
+                driverSeat.position,
+                smoothSpeed * Time.deltaTime
+            );
+
+            currentDriver.transform.rotation = Quaternion.Slerp(
+                currentDriver.transform.rotation,
+                driverSeat.rotation,
+                rotationSpeed * Time.deltaTime
+            );
         }
     }
 

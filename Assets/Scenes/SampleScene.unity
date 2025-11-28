@@ -15219,10 +15219,6 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 2410720072
       objectReference: {fileID: 0}
-    - target: {fileID: 3243650729833697742, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
     - target: {fileID: 3710599602106560500, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: m_Name
       value: Forklift

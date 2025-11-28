@@ -85,11 +85,7 @@ public class MaterialRequiredMachine : Machine
 
     private void UpdateMaterial(float value)
     {
-        Debug.Log("Updating material count");
         CurrentMaterial.Value = Mathf.Clamp(value, 0, maxMaterial);
-
-        // Broadcast the new progress to listeners
-        // OnMaterialChanged?.Invoke(CurrentMaterial.Value, maxMaterial);
     }
 
     public void AddMaterial(float amount)
