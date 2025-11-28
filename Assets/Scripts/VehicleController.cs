@@ -19,10 +19,6 @@ public class VehicleController : Interactable
     public float minForkHeight = 0f;
     public float maxForkHeight = 3f;
 
-    [Header("Client Prediction")]
-    public float reconciliationThreshold = 0.5f; // Distance before snapping to server position
-    public float reconciliationSpeed = 10f; // How fast to smooth toward server position
-
     private Rigidbody rb;
     private VehicleControls controls;
     private Vector2 moveInput;
@@ -40,11 +36,6 @@ public class VehicleController : Interactable
 
     private GameObject currentDriver;
 
-    // Client prediction state
-    private Vector3 lastServerPosition;
-    private Quaternion lastServerRotation;
-    private bool isReconciling = false;
-
     private void Awake()
     {
         controls = new VehicleControls();
@@ -53,16 +44,13 @@ public class VehicleController : Interactable
     private void Start()
     {
         rb = GetComponent<Rigidbody>();
-        rb.isKinematic = false;
+        rb.isKinematic = false; // Forklift must always be dynamic
         rb.centerOfMass = new Vector3(0, -0.5f, 0);
         rb.linearDamping = 1f;
         rb.angularDamping = 1f;
 
         if (forks != null)
             forkStartPosition = forks.localPosition;
-
-        lastServerPosition = transform.position;
-        lastServerRotation = transform.rotation;
     }
 
     private void OnEnable()
@@ -106,6 +94,10 @@ public class VehicleController : Interactable
     {
         driverClientId.Value = clientId;
         currentDriver = player;
+
+        // DON'T change ownership - keep it on server for physics
+        // NetworkObject.ChangeOwnership(clientId);
+
         NotifyEnterVehicleClientRpc(clientId);
     }
 
@@ -120,6 +112,9 @@ public class VehicleController : Interactable
         isBraking = false;
         forkInput = 0f;
 
+        // Ownership stays with server (no need to remove)
+        // NetworkObject.RemoveOwnership();
+
         NotifyExitVehicleClientRpc(exitingClientId);
     }
 
@@ -133,16 +128,19 @@ public class VehicleController : Interactable
 
         currentDriver = player;
 
+        // Move player to driver seat initially
         if (driverSeat != null)
         {
             player.transform.position = driverSeat.position;
             player.transform.rotation = driverSeat.rotation;
         }
 
+        // Make player kinematic
         var playerRb = player.GetComponent<Rigidbody>();
         if (playerRb != null)
             playerRb.isKinematic = true;
 
+        // Set isDriving on the player script
         var playerScript = player.GetComponent<PhysicsPlayerController>();
         if (playerScript != null)
             playerScript.SetVehicle(this);
@@ -160,12 +158,16 @@ public class VehicleController : Interactable
         if (player == null) return;
 
         currentDriver = null;
+
+        // Move player slightly beside vehicle
         player.transform.position = transform.position + transform.right * 2f;
 
+        // Make player non-kinematic
         var playerRb = player.GetComponent<Rigidbody>();
         if (playerRb != null)
             playerRb.isKinematic = false;
 
+        // Set isDriving on the player script
         var playerScript = player.GetComponent<PhysicsPlayerController>();
         if (playerScript != null)
             playerScript.SetVehicle(null);
@@ -196,6 +198,7 @@ public class VehicleController : Interactable
         SendVehicleInputServerRpc(moveInput, lift, isBraking);
     }
 
+    // Server authoritative input
     [Rpc(SendTo.Server)]
     private void SendVehicleInputServerRpc(Vector2 move, float fork, bool brake)
     {
@@ -208,22 +211,9 @@ public class VehicleController : Interactable
     {
         if (!HasDriver()) return;
 
-        if (IsServer)
-        {
-            // Server: Run authoritative physics
-            RunVehiclePhysics();
-        }
-        else if (IsLocalPlayerDriving())
-        {
-            // Local client driving: Run prediction
-            RunVehiclePhysics();
-            CheckReconciliation();
-        }
-        // Other clients: NetworkTransform handles interpolation normally
-    }
+        // Physics only runs on server
+        if (!IsServer) return;
 
-    private void RunVehiclePhysics()
-    {
         float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
 
         // Apply forward/backward force
@@ -257,54 +247,9 @@ public class VehicleController : Interactable
         }
     }
 
-    private void CheckReconciliation()
-    {
-        // When server update arrives, check if we need to correct
-        float positionError = Vector3.Distance(transform.position, lastServerPosition);
-        
-        if (positionError > reconciliationThreshold)
-        {
-            // Large error: snap to server position
-            transform.position = lastServerPosition;
-            transform.rotation = lastServerRotation;
-            rb.linearVelocity = Vector3.zero;
-            isReconciling = false;
-        }
-        else if (positionError > 0.01f)
-        {
-            // Small error: smoothly correct
-            isReconciling = true;
-        }
-    }
-
-    private void Update()
-    {
-        // Track server position updates (NetworkTransform sets these)
-        if (!IsServer && !IsLocalPlayerDriving())
-        {
-            lastServerPosition = transform.position;
-            lastServerRotation = transform.rotation;
-        }
-        else if (!IsServer && IsLocalPlayerDriving() && isReconciling)
-        {
-            // Smoothly correct toward server position
-            transform.position = Vector3.Lerp(transform.position, lastServerPosition, Time.deltaTime * reconciliationSpeed);
-            transform.rotation = Quaternion.Slerp(transform.rotation, lastServerRotation, Time.deltaTime * reconciliationSpeed);
-            
-            if (Vector3.Distance(transform.position, lastServerPosition) < 0.01f)
-                isReconciling = false;
-        }
-    }
-
-    public void OnServerPositionUpdate(Vector3 serverPos, Quaternion serverRot)
-    {
-        // Call this from NetworkTransform's OnValueChanged callback
-        lastServerPosition = serverPos;
-        lastServerRotation = serverRot;
-    }
-
     private void LateUpdate()
     {
+        // Keep driver in seat position every frame
         if (currentDriver != null && driverSeat != null)
         {
             currentDriver.transform.position = driverSeat.position;
