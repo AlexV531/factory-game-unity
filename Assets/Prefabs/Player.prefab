@@ -303,7 +303,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 2994412009
+  GlobalObjectIdHash: 2386474893
   InScenePlacedSourceGlobalObjectIdHash: 2386474893
   DeferredDespawnTick: 0
   Ownership: 1
@@ -336,7 +336,7 @@ MonoBehaviour:
   groundCheckDistance: 0.3
   groundLayer:
     serializedVersion: 2
-    m_Bits: 192
+    m_Bits: 193
   cameraRoot: {fileID: 3091062813587992435}
   mouseSensitivity: 0.1
   webcamStreamer: {fileID: 8246503290707965238}
@@ -460,7 +460,7 @@ MonoBehaviour:
   UseHalfFloatPrecision: 0
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
-  Interpolate: 1
+  Interpolate: 0
   SlerpPosition: 0
 --- !u!114 &7856599237970863809
 MonoBehaviour:
@@ -509,8 +509,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::WebcamStreamer
   ShowTopMostFoldoutHeaderGroup: 1
   targetRenderer: {fileID: 4420973812662768041}
-  textureWidth: 640
-  textureHeight: 480
+  targetWidth: 160
+  targetHeight: 120
   fps: 15
   jpgQuality: 25
 --- !u!1 &4680196624574217665

@@ -24,6 +24,9 @@ public class PhysicsPlayerController : NetworkBehaviour
     private bool isGrounded;
     private float cameraRotationX = 0f;
 
+    // Vehicle State variables
+    private VehicleController vehicle;
+
     // Input System variables
     private Vector2 moveInput;
     private Vector2 lookInput;
@@ -80,6 +83,8 @@ public class PhysicsPlayerController : NetworkBehaviour
 
         HandleMouseLook();
 
+        if (vehicle != null) return;
+
         // Jump input
         if (jumpInput && isGrounded)
         {
@@ -106,6 +111,12 @@ public class PhysicsPlayerController : NetworkBehaviour
         {
             Cursor.lockState = CursorLockMode.None;
             Cursor.visible = true;
+        }
+
+        if (vehicle != null)
+        {
+            MoveWithVehicle();
+            return;
         }
 
         CheckGrounded();
@@ -157,6 +168,11 @@ public class PhysicsPlayerController : NetworkBehaviour
         {
             rb.linearVelocity = new Vector3(rb.linearVelocity.x * 0.9f, rb.linearVelocity.y, rb.linearVelocity.z * 0.9f);
         }
+    }
+
+    void MoveWithVehicle()
+    {
+        // transform.position = vehicle.driverSeat.position;
     }
 
     void HandleMenus()
@@ -235,4 +251,7 @@ public class PhysicsPlayerController : NetworkBehaviour
     {
         rb.AddForce(force, ForceMode.Impulse);
     }
+
+    public bool IsDriving() => vehicle != null;
+    public void SetVehicle(VehicleController vehicle) => this.vehicle = vehicle;
 }
