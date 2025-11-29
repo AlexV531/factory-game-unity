@@ -215,7 +215,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3710599602106560500}
   serializedVersion: 5
-  m_Mass: 100
+  m_Mass: 500
   m_LinearDamping: 1
   m_AngularDamping: 1
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -318,7 +318,7 @@ MonoBehaviour:
   forks: {fileID: 1882519641736508126}
   forkLiftSpeed: 2
   minForkHeight: 0
-  maxForkHeight: 3
+  maxForkHeight: 4
 --- !u!1 &4292633675924663210
 GameObject:
   m_ObjectHideFlags: 0

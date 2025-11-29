@@ -8,7 +8,7 @@ public class VehicleController : Interactable
     public float motorForce = 18f;
     public float turnSpeed = 260f;
     public float maxSpeed = 24f;
-    public float minTurnSpeedFactor = 0.1f;
+    public float minTurnSpeedFactor = 0.3f;
 
     [Header("Entry System")]
     public Transform driverSeat;
@@ -223,22 +223,7 @@ public class VehicleController : Interactable
 
         if (IsServer)
         {
-            float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
-
-            if (Mathf.Abs(forwardSpeed) < maxSpeed)
-                rb.AddForce(transform.forward * moveInput.y * motorForce, ForceMode.Acceleration);
-
-            float speedFactor = Mathf.Lerp(minTurnSpeedFactor, 1f, Mathf.InverseLerp(0f, maxSpeed, Mathf.Abs(forwardSpeed)));
-            float proportionalTurnSpeed = turnSpeed * speedFactor;
-            float targetAngularVelocity = moveInput.x * proportionalTurnSpeed * Mathf.Deg2Rad;
-
-            if (!rb.isKinematic)
-                rb.angularVelocity = new Vector3(0, targetAngularVelocity, 0);
-
-            if (isBraking)
-                rb.linearVelocity *= 0.95f;
-
-            // Server authoritative fork movement
+            // --- 1. Update fork height first ---
             if (forks != null)
             {
                 ForkHeight.Value = Mathf.Clamp(
@@ -247,14 +232,42 @@ public class VehicleController : Interactable
                     maxForkHeight
                 );
 
-                // Directly move forks on server
-                Vector3 newPos = forkStartPosition;
-                newPos.y += ForkHeight.Value;
-                forks.localPosition = newPos;
+                Vector3 newForkPosition = forkStartPosition;
+                newForkPosition.y += ForkHeight.Value;
+                forks.localPosition = newForkPosition;
             }
+
+            // --- 2. Adjust center of mass dynamically ---
+            Vector3 baseCoM = new Vector3(0, -0.5f, 0);
+            // Lower CoM slightly as forks go up for stability
+            rb.centerOfMass = baseCoM - new Vector3(0, ForkHeight.Value * 0.01f, 0);
+
+            // --- 3. Apply forward/backward force ---
+            float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
+            if (Mathf.Abs(forwardSpeed) < maxSpeed)
+                rb.AddForce(transform.forward * moveInput.y * motorForce, ForceMode.Acceleration);
+
+            // --- 4. Apply turning torque ---
+            float speedFactor = Mathf.Lerp(minTurnSpeedFactor, 1f, Mathf.InverseLerp(0f, maxSpeed, Mathf.Abs(forwardSpeed)));
+            float turnTorque = moveInput.x * turnSpeed;
+
+            // Apply a minimum torque so you can always turn when stationary
+            float minTorque = 0.5f; // tune as needed
+            turnTorque = Mathf.Sign(turnTorque) * Mathf.Max(Mathf.Abs(turnTorque * speedFactor), minTorque);
+
+            rb.AddTorque(Vector3.up * turnTorque * rb.mass * 0.1f, ForceMode.Force);
+
+            // Optional: clamp angular velocity to prevent runaway spin
+            Vector3 angVel = rb.angularVelocity;
+            angVel.y = Mathf.Clamp(angVel.y, -1f, 1f); 
+            rb.angularVelocity = angVel;
+
+            // --- 5. Apply braking ---
+            if (isBraking)
+                rb.linearVelocity *= 0.95f;
         }
 
-        // Client-side smoothing of fork position
+        // --- Client-side fork smoothing ---
         if (!IsServer && forks != null)
         {
             Vector3 targetPos = forkStartPosition;
@@ -262,23 +275,11 @@ public class VehicleController : Interactable
             forks.localPosition = Vector3.Lerp(forks.localPosition, targetPos, 10f * Time.deltaTime);
         }
 
-        // Smoothly move driver for everyone
+        // --- Smoothly move driver ---
         if (currentDriver != null && driverSeat != null)
         {
-            float smoothSpeed = 15f;
-            float rotationSpeed = 1f;
-
-            currentDriver.transform.position = Vector3.Lerp(
-                currentDriver.transform.position,
-                driverSeat.position,
-                smoothSpeed * Time.deltaTime
-            );
-
-            currentDriver.transform.rotation = Quaternion.Slerp(
-                currentDriver.transform.rotation,
-                driverSeat.rotation,
-                rotationSpeed * Time.deltaTime
-            );
+            currentDriver.transform.position = Vector3.Lerp(currentDriver.transform.position, driverSeat.position, 15f * Time.deltaTime);
+            currentDriver.transform.rotation = Quaternion.Slerp(currentDriver.transform.rotation, driverSeat.rotation, 1f * Time.deltaTime);
         }
     }
 
