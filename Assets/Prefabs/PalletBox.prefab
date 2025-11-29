@@ -461,7 +461,7 @@ GameObject:
   - component: {fileID: 8746548134969644785}
   - component: {fileID: 3594549776719851223}
   - component: {fileID: 6815750015527314106}
-  - component: {fileID: 4260699763439215737}
+  - component: {fileID: -702105385717694045}
   m_Layer: 7
   m_Name: PalletBox
   m_TagString: Untagged
@@ -573,7 +573,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8764060456474440710}
   serializedVersion: 5
-  m_Mass: 15
+  m_Mass: 25
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -604,7 +604,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d5a57f767e5e46a458fc5d3c628d0cbb, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.NetworkObject
-  GlobalObjectIdHash: 1473700893
+  GlobalObjectIdHash: 3877052292
   InScenePlacedSourceGlobalObjectIdHash: 3877052292
   DeferredDespawnTick: 0
   Ownership: 1
@@ -630,7 +630,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GrabbableObject
   ShowTopMostFoldoutHeaderGroup: 1
-  grabForceMultiplier: 500
+  grabForceMultiplier: 750
   dampingMultiplier: 10
   maxGrabForce: 1000
   dragWhenGrabbed: 5
@@ -698,7 +698,7 @@ MonoBehaviour:
   UseRigidBodyForMotion: 1
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!114 &4260699763439215737
+--- !u!114 &-702105385717694045
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -707,7 +707,7 @@ MonoBehaviour:
   m_GameObject: {fileID: 8764060456474440710}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b536e9bafe046542956c48963ea1aef, type: 3}
+  m_Script: {fileID: 11500000, guid: f2d7819884eea924e9fbca3a37f1327a, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Product
-  productCode: 0
+  m_EditorClassIdentifier: Assembly-CSharp::PalletBox
+  productCodes: 

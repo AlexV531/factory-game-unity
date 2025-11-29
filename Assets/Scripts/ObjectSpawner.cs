@@ -3,13 +3,10 @@ using Unity.Netcode;
 
 public class ObjectSpawner : NetworkBehaviour
 {
-    [SerializeField] private GameObject prefabToSpawn;
-    [SerializeField] private float spawnInterval = 2f;
-    [SerializeField] private bool spawnOnStart = true;
-    [SerializeField] private Transform spawnPoint;
-    
-    private float timer = 0f;
-    private bool isSpawning = false;
+    [SerializeField] protected GameObject prefabToSpawn;
+    [SerializeField] protected Transform spawnPoint;
+
+    private bool readyToSpawn = true;
 
     private void Start()
     {
@@ -20,31 +17,7 @@ public class ObjectSpawner : NetworkBehaviour
         }
     }
 
-    public override void OnNetworkSpawn()
-    {
-        base.OnNetworkSpawn();
-        
-        if (spawnOnStart && IsServer)
-        {
-            StartSpawning();
-        }
-    }
-
-    private void Update()
-    {
-        // Only the server/host should spawn objects
-        if (!IsServer || !isSpawning) return;
-
-        timer += Time.deltaTime;
-
-        if (timer >= spawnInterval)
-        {
-            SpawnObject();
-            timer = 0f;
-        }
-    }
-
-    public void SpawnObject()
+    public virtual void SpawnObject()
     {
         if (prefabToSpawn == null)
         {
@@ -68,40 +41,8 @@ public class ObjectSpawner : NetworkBehaviour
         }
     }
 
-    // Public methods to control spawning
-    public void StartSpawning()
+    public virtual bool ReadyToSpawn()
     {
-        Debug.Log("StartSpawning");
-        if (IsServer)
-        {
-            Debug.Log("Starting object spawning");
-            isSpawning = true;
-            timer = 0f;
-        }
-    }
-
-    public void StopSpawning()
-    {
-        if (IsServer)
-        {
-            isSpawning = false;
-        }
-    }
-
-    public void SetSpawnInterval(float interval)
-    {
-        if (IsServer)
-        {
-            spawnInterval = Mathf.Max(0.1f, interval);
-        }
-    }
-
-    public void SpawnNow()
-    {
-        if (IsServer)
-        {
-            SpawnObject();
-            timer = 0f;
-        }
+        return readyToSpawn;
     }
 }
