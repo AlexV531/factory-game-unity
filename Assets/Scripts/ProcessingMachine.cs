@@ -24,7 +24,6 @@ public class ProcessingMachine : Machine
 
     public virtual void InputItem(int productCode)
     {
-        Debug.Log(productCode);
         CurrentNumInputs.Value++;
         inputtedProductCodes.Add(productCode);
 

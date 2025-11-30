@@ -68,6 +68,8 @@ public class GrabbableObject : NetworkBehaviour
     {
         if (!IsServer) return;
 
+        Debug.Log("Adding grabber");
+
         if (!grabberClientIds.Contains(clientId))
         {
             grabberClientIds.Add(clientId);
