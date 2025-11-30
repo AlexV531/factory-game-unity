@@ -205,10 +205,10 @@ MonoBehaviour:
   PositionInterpolationType: 0
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
-  PositionLerpSmoothing: 0
-  PositionMaxInterpolationTime: 0.1
+  PositionLerpSmoothing: 1
+  PositionMaxInterpolationTime: 0.04
   RotationLerpSmoothing: 1
-  RotationMaxInterpolationTime: 0.1
+  RotationMaxInterpolationTime: 0.04
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 0
@@ -232,7 +232,7 @@ MonoBehaviour:
   InLocalSpace: 0
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
-  SlerpPosition: 1
+  SlerpPosition: 0
 --- !u!114 &4902730752778139640
 MonoBehaviour:
   m_ObjectHideFlags: 0
