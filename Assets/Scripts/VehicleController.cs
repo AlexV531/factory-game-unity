@@ -15,22 +15,25 @@ public class VehicleController : Interactable
 
     [Header("Fork System")]
     public Transform forks;
-    public float forkLiftSpeed = 2f;
+    public ConfigurableJoint forksJoint;
+    public float liftSpeed = 2f;
     public float minForkHeight = 0f;
     public float maxForkHeight = 3f;
 
     private Rigidbody rb;
+    private Rigidbody forksRb;
     private VehicleControls controls;
     private Vector2 moveInput;
     private bool isBraking;
     private float forkInput;
+    private float currentForksTarget;
 
     // private float currentForkHeight = 0f;
-    private NetworkVariable<float> ForkHeight = new NetworkVariable<float>(
-        0f,
-        NetworkVariableReadPermission.Everyone,
-        NetworkVariableWritePermission.Server
-    );
+    // private NetworkVariable<float> ForkHeight = new NetworkVariable<float>(
+    //     0f,
+    //     NetworkVariableReadPermission.Everyone,
+    //     NetworkVariableWritePermission.Server
+    // );
     private Vector3 forkStartPosition;
 
     private NetworkVariable<ulong> driverClientId = new NetworkVariable<ulong>(
@@ -53,6 +56,9 @@ public class VehicleController : Interactable
         rb.centerOfMass = new Vector3(0, -0.5f, 0);
         rb.linearDamping = 1f;
         rb.angularDamping = 1f;
+
+        forksRb = forks.GetComponent<Rigidbody>();
+        forksRb.isKinematic = false;
 
         if (forks != null)
             forkStartPosition = forks.localPosition;
@@ -226,21 +232,24 @@ public class VehicleController : Interactable
             // --- 1. Update fork height first ---
             if (forks != null)
             {
-                ForkHeight.Value = Mathf.Clamp(
-                    ForkHeight.Value + forkInput * forkLiftSpeed * Time.fixedDeltaTime,
-                    minForkHeight,
-                    maxForkHeight
-                );
+                // Compute new height
+                currentForksTarget += forkInput * liftSpeed * Time.deltaTime;
 
-                Vector3 newForkPosition = forkStartPosition;
-                newForkPosition.y += ForkHeight.Value;
-                forks.localPosition = newForkPosition;
+                Debug.Log(currentForksTarget + " is the current fork target");
+
+                // Clamp to min/max
+                currentForksTarget = Mathf.Clamp(currentForksTarget, minForkHeight, maxForkHeight);
+
+                // Update the joint's target
+                Vector3 tp = forksJoint.targetPosition;
+                tp.y = -currentForksTarget;  // negative because Unity joint axis is reversed
+                forksJoint.targetPosition = tp;
             }
 
             // --- 2. Adjust center of mass dynamically ---
             Vector3 baseCoM = new Vector3(0, -0.5f, 0);
             // Lower CoM slightly as forks go up for stability
-            rb.centerOfMass = baseCoM - new Vector3(0, ForkHeight.Value * 0.01f, 0);
+            // rb.centerOfMass = baseCoM - new Vector3(0,  * 0.01f, 0);
 
             // --- 3. Apply forward/backward force ---
             float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
@@ -268,12 +277,12 @@ public class VehicleController : Interactable
         }
 
         // --- Client-side fork smoothing ---
-        if (!IsServer && forks != null)
-        {
-            Vector3 targetPos = forkStartPosition;
-            targetPos.y += ForkHeight.Value;
-            forks.localPosition = Vector3.Lerp(forks.localPosition, targetPos, 10f * Time.deltaTime);
-        }
+        // if (!IsServer && forks != null)
+        // {
+        //     Vector3 targetPos = forkStartPosition;
+        //     targetPos.y += ForkHeight.Value;
+        //     forks.localPosition = Vector3.Lerp(forks.localPosition, targetPos, 10f * Time.deltaTime);
+        // }
 
         // --- Smoothly move driver ---
         if (currentDriver != null && driverSeat != null)

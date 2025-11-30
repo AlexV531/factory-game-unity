@@ -1,3 +1,9 @@
 TODO:
-Assembly line conveyor belts
-Auto release object if too far away
+Grabbable objects need a "grab point" that is a transform that tells the object where to put the force when the player picks up an object.
+Continue to tweak forklift, still a little too wobbly, needs a larger base.
+Interactable terminal.
+Train that gets loaded with boxes.
+Openable door.
+
+BUGS:
+Client side forklift movementinputs get overwritten if multiple inputs are pressed at once, eg. can only lift if not moving and vice versa.

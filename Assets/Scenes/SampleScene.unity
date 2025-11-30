@@ -10841,7 +10841,7 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 1097326145929379398, guid: 9e1a72c6b27f49c4eb3896a670a5ffc8, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -3.499032
+      value: -9.33
       objectReference: {fileID: 0}
     - target: {fileID: 1097326145929379398, guid: 9e1a72c6b27f49c4eb3896a670a5ffc8, type: 3}
       propertyPath: m_LocalPosition.y
@@ -22124,22 +22124,6 @@ PrefabInstance:
       propertyPath: GlobalObjectIdHash
       value: 2410720072
       objectReference: {fileID: 0}
-    - target: {fileID: 1601730636459082325, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
-      propertyPath: maxSpeed
-      value: 4
-      objectReference: {fileID: 0}
-    - target: {fileID: 1601730636459082325, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
-      propertyPath: turnSpeed
-      value: 160
-      objectReference: {fileID: 0}
-    - target: {fileID: 1601730636459082325, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
-      propertyPath: minTurnSpeedFactor
-      value: 0.7
-      objectReference: {fileID: 0}
-    - target: {fileID: 2722616800184570953, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
-      propertyPath: m_Constraints
-      value: 0
-      objectReference: {fileID: 0}
     - target: {fileID: 3710599602106560500, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: m_Name
       value: Forklift
@@ -22154,7 +22138,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3944118322591767695, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 16.874866
+      value: 21.09
       objectReference: {fileID: 0}
     - target: {fileID: 3944118322591767695, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: m_LocalRotation.w
@@ -22183,6 +22167,22 @@ PrefabInstance:
     - target: {fileID: 3944118322591767695, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6335632664266433867, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
+      propertyPath: UseRigidBodyForMotion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6335632664266433867, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
+      propertyPath: AutoUpdateKinematicState
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402594325060731972, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
+      propertyPath: UseRigidBodyForMotion
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8402594325060731972, guid: d2e424d950fcc584a88135512cfcba09, type: 3}
+      propertyPath: AutoUpdateKinematicState
+      value: 1
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
