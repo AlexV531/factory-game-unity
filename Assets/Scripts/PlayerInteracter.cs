@@ -38,8 +38,15 @@ public class PlayerInteracter : NetworkBehaviour
             {
                 Debug.Log("Grabbable object component found");
                 grabbedObject = grobject;
-                // Request grab from server
-                RequestGrabServerRpc(grobject.NetworkObjectId);
+                
+                // Find the parent NetworkObject
+                NetworkObject netObj = grobject.GetComponentInParent<NetworkObject>();
+                if (netObj != null)
+                {
+                    // Get the path from the NetworkObject to this specific child
+                    string childPath = GetRelativePath(netObj.transform, grobject.transform);
+                    RequestGrabServerRpc(netObj.NetworkObjectId, childPath);
+                }
             }
             else
             {
@@ -48,8 +55,12 @@ public class PlayerInteracter : NetworkBehaviour
                 if (interactable != null)
                 {
                     Debug.Log("Interactable component found");
-                    // Request interact from server
-                    RequestInteractServerRpc(interactable.NetworkObjectId);
+                    NetworkObject netObj = interactable.GetComponentInParent<NetworkObject>();
+                    if (netObj != null)
+                    {
+                        string childPath = GetRelativePath(netObj.transform, interactable.transform);
+                        RequestInteractServerRpc(netObj.NetworkObjectId, childPath);
+                    }
                 }
             }
         }
@@ -60,50 +71,90 @@ public class PlayerInteracter : NetworkBehaviour
         Debug.Log("Release");
         if (grabbedObject == null)
             return;
-
-        // Request release from server
-        RequestReleaseServerRpc(grabbedObject.NetworkObjectId);
+        
+        NetworkObject netObj = grabbedObject.GetComponentInParent<NetworkObject>();
+        if (netObj != null)
+        {
+            string childPath = GetRelativePath(netObj.transform, grabbedObject.transform);
+            RequestReleaseServerRpc(netObj.NetworkObjectId, childPath);
+        }
         grabbedObject = null;
     }
 
-    [ServerRpc]
-    void RequestGrabServerRpc(ulong objectId)
+    // Helper method to get the relative path from parent to child
+    string GetRelativePath(Transform parent, Transform child)
     {
-        // Find the network object and add this grabber to it
+        if (parent == child)
+            return "";
+        
+        string path = child.name;
+        Transform current = child.parent;
+        
+        while (current != null && current != parent)
+        {
+            path = current.name + "/" + path;
+            current = current.parent;
+        }
+        
+        return path;
+    }
+
+    // Helper method to find a child by path
+    Transform FindChildByPath(Transform parent, string path)
+    {
+        if (string.IsNullOrEmpty(path))
+            return parent;
+        
+        return parent.Find(path);
+    }
+
+    [ServerRpc]
+    void RequestGrabServerRpc(ulong objectId, string childPath)
+    {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))
         {
-            GrabbableObject grabbable = netObj.GetComponent<GrabbableObject>();
-            if (grabbable != null)
+            Transform targetTransform = FindChildByPath(netObj.transform, childPath);
+            if (targetTransform != null)
             {
-                grabbable.AddGrabber(OwnerClientId, grabPoint);
+                GrabbableObject grabbable = targetTransform.GetComponent<GrabbableObject>();
+                if (grabbable != null)
+                {
+                    grabbable.AddGrabber(OwnerClientId, grabPoint);
+                }
             }
         }
     }
 
     [ServerRpc]
-    void RequestReleaseServerRpc(ulong objectId)
+    void RequestReleaseServerRpc(ulong objectId, string childPath)
     {
-        // Find the network object and remove this grabber from it
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))
         {
-            GrabbableObject grabbable = netObj.GetComponent<GrabbableObject>();
-            if (grabbable != null)
+            Transform targetTransform = FindChildByPath(netObj.transform, childPath);
+            if (targetTransform != null)
             {
-                grabbable.RemoveGrabber(OwnerClientId);
+                GrabbableObject grabbable = targetTransform.GetComponent<GrabbableObject>();
+                if (grabbable != null)
+                {
+                    grabbable.RemoveGrabber(OwnerClientId);
+                }
             }
         }
     }
 
     [ServerRpc]
-    void RequestInteractServerRpc(ulong objectId)
+    void RequestInteractServerRpc(ulong objectId, string childPath)
     {
-        // Find the network object and call its Interact function
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))
         {
-            Interactable interactable = netObj.GetComponent<Interactable>();
-            if (interactable != null)
+            Transform targetTransform = FindChildByPath(netObj.transform, childPath);
+            if (targetTransform != null)
             {
-                interactable.Interact(OwnerClientId);
+                Interactable interactable = targetTransform.GetComponent<Interactable>();
+                if (interactable != null)
+                {
+                    interactable.Interact(OwnerClientId);
+                }
             }
         }
     }
