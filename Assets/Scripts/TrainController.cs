@@ -2,7 +2,7 @@ using UnityEngine;
 
 public class TrainController : MonoBehaviour
 {
-    public Transform[] points; // 0 = start (optional), 1 = stop, 2 = next point
+    public Transform[] points;
     public float speed = 5f;
     public float stopDuration = 2f;
 
@@ -32,8 +32,7 @@ public class TrainController : MonoBehaviour
     {
         isStopping = true;
 
-        // Only wait at the first stop (index 1)
-        if (currentPointIndex == 1)
+        if (currentPointIndex == 0)
             yield return new WaitForSeconds(stopDuration);
 
         currentPointIndex++;

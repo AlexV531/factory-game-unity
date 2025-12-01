@@ -160,7 +160,7 @@ MonoBehaviour:
   GlobalObjectIdHash: 3174581852
   InScenePlacedSourceGlobalObjectIdHash: 3174581852
   DeferredDespawnTick: 0
-  Ownership: 1
+  Ownership: 0
   AlwaysReplicateAsRoot: 0
   SynchronizeTransform: 1
   ActiveSceneSynchronization: 0
@@ -188,6 +188,11 @@ MonoBehaviour:
   maxGrabForce: 1000
   dragWhenGrabbed: 5
   maxGrabDistance: 2
+  grabTransform: {fileID: 0}
+  edgePoint1: {fileID: 0}
+  edgePoint2: {fileID: 0}
+  snapDistance: 0.3
+  snapStrength: 0.5
 --- !u!114 &8913340400781639366
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -224,7 +229,7 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.001
+  PositionThreshold: 0.01
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
