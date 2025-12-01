@@ -22,19 +22,6 @@ public class SnappingJoinedObject : NetworkBehaviour
     {
         rb = GetComponent<Rigidbody>();
 
-        // Convert all edge points to local space
-        if (edgePoints != null && edgePoints.Length > 0)
-        {
-            edgeTargets = new Vector3[edgePoints.Length];
-            for (int i = 0; i < edgePoints.Length; i++)
-            {
-                if (edgePoints[i] != null)
-                {
-                    edgeTargets[i] = rb.transform.InverseTransformPoint(edgePoints[i].transform.position);
-                }
-            }
-        }
-
         // Store original drive settings
         if (configurableJoint != null)
         {
@@ -44,6 +31,27 @@ public class SnappingJoinedObject : NetworkBehaviour
 
             // Start with drives disabled
             DisableJointDrives();
+        }
+    }
+
+    void Start()
+    {
+        // Convert all edge points to local space without scale affecting the coordinates
+        if (edgePoints != null && edgePoints.Length > 0)
+        {
+            edgeTargets = new Vector3[edgePoints.Length];
+            for (int i = 0; i < edgePoints.Length; i++)
+            {
+                if (edgePoints[i] != null)
+                {
+                    // Get world offset
+                    Vector3 worldOffset = edgePoints[i].transform.position - rb.transform.position;
+                    // Convert to local direction (rotation only, no scale)
+                    Vector3 localDirection = rb.transform.InverseTransformDirection(worldOffset);
+                    // Keep the world distance
+                    edgeTargets[i] = localDirection.normalized * worldOffset.magnitude;
+                }
+            }
         }
     }
 
