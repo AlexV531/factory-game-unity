@@ -24,8 +24,9 @@ public class VehicleController : Interactable
     private Rigidbody forksRb;
     private VehicleControls controls;
     private Vector2 moveInput;
-    private bool isBraking;
     private float forkInput;
+    private Vector2 localMoveInput;
+    private float localForkInput;
     private float currentForksTarget;
 
     // private float currentForkHeight = 0f;
@@ -74,8 +75,6 @@ public class VehicleController : Interactable
         controls.Vehicle.Enable();
         controls.Vehicle.Move.performed += OnMove;
         controls.Vehicle.Move.canceled += OnMove;
-        controls.Vehicle.Brake.performed += OnBrake;
-        controls.Vehicle.Brake.canceled += OnBrake;
         controls.Vehicle.Lift.performed += OnLift;
         controls.Vehicle.Lift.canceled += OnLift;
     }
@@ -84,8 +83,6 @@ public class VehicleController : Interactable
     {
         controls.Vehicle.Move.performed -= OnMove;
         controls.Vehicle.Move.canceled -= OnMove;
-        controls.Vehicle.Brake.performed -= OnBrake;
-        controls.Vehicle.Brake.canceled -= OnBrake;
         controls.Vehicle.Lift.performed -= OnLift;
         controls.Vehicle.Lift.canceled -= OnLift;
         controls.Vehicle.Disable();
@@ -111,8 +108,7 @@ public class VehicleController : Interactable
         driverClientId.Value = clientId;
         currentDriver = player;
 
-        // DON'T change ownership - keep it on server for physics
-        // NetworkObject.ChangeOwnership(clientId);
+        NetworkObject.ChangeOwnership(clientId);
 
         NotifyEnterVehicleClientRpc(clientId);
     }
@@ -125,11 +121,9 @@ public class VehicleController : Interactable
         currentDriver = null;
 
         moveInput = Vector2.zero;
-        isBraking = false;
         forkInput = 0f;
 
-        // Ownership stays with server (no need to remove)
-        // NetworkObject.RemoveOwnership();
+        NetworkObject.RemoveOwnership();
 
         NotifyExitVehicleClientRpc(exitingClientId);
     }
@@ -197,45 +191,46 @@ public class VehicleController : Interactable
     {
         if (!IsLocalPlayerDriving()) return;
         Vector2 input = context.ReadValue<Vector2>();
-        SendVehicleInputServerRpc(input, forkInput, isBraking);
-    }
-
-    private void OnBrake(InputAction.CallbackContext context)
-    {
-        if (!IsLocalPlayerDriving()) return;
-        bool brake = context.ReadValueAsButton();
-        SendVehicleInputServerRpc(moveInput, forkInput, brake);
+        localMoveInput = input;
+        SendVehicleInputServerRpc(input, localForkInput);
     }
 
     private void OnLift(InputAction.CallbackContext context)
     {
         if (!IsLocalPlayerDriving()) return;
         float lift = context.ReadValue<float>();
-        SendVehicleInputServerRpc(moveInput, lift, isBraking);
+        localForkInput = lift;
+        SendVehicleInputServerRpc(localMoveInput, lift);
     }
 
     // Server authoritative input
     [Rpc(SendTo.Server)]
-    private void SendVehicleInputServerRpc(Vector2 move, float fork, bool brake)
+    private void SendVehicleInputServerRpc(Vector2 move, float fork)
     {
         moveInput = move;
         forkInput = fork;
-        isBraking = brake;
+        SendVehicleInputClientRpc(move, fork);
+    }
+
+    [ClientRpc]
+    private void SendVehicleInputClientRpc(Vector2 move, float fork)
+    {
+        moveInput = move;
+        forkInput = fork;
     }
 
     private void FixedUpdate()
     {
         if (!HasDriver()) return;
 
-        if (IsServer)
+        // if (IsServer)
+        if (true)
         {
             // --- 1. Update fork height first ---
             if (forks != null)
             {
                 // Compute new height
                 currentForksTarget += forkInput * liftSpeed * Time.deltaTime;
-
-                Debug.Log(currentForksTarget + " is the current fork target");
 
                 // Clamp to min/max
                 currentForksTarget = Mathf.Clamp(currentForksTarget, minForkHeight, maxForkHeight);
@@ -247,7 +242,7 @@ public class VehicleController : Interactable
             }
 
             // --- 2. Adjust center of mass dynamically ---
-            Vector3 baseCoM = new Vector3(0, -0.5f, 0);
+            // Vector3 baseCoM = new Vector3(0, -0.5f, 0);
             // Lower CoM slightly as forks go up for stability
             // rb.centerOfMass = baseCoM - new Vector3(0,  * 0.01f, 0);
 
@@ -255,6 +250,9 @@ public class VehicleController : Interactable
             float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
             if (Mathf.Abs(forwardSpeed) < maxSpeed)
                 rb.AddForce(transform.forward * moveInput.y * motorForce, ForceMode.Acceleration);
+            
+            // Debug.Log("forwardSpeed " + forwardSpeed + " maxSpeed " + maxSpeed);
+            // Debug.Log("moveInput.y " + moveInput.y + " motorForce " + motorForce);
 
             // --- 4. Apply turning torque ---
             float speedFactor = Mathf.Lerp(minTurnSpeedFactor, 1f, Mathf.InverseLerp(0f, maxSpeed, Mathf.Abs(forwardSpeed)));
@@ -270,10 +268,6 @@ public class VehicleController : Interactable
             Vector3 angVel = rb.angularVelocity;
             angVel.y = Mathf.Clamp(angVel.y, -1f, 1f); 
             rb.angularVelocity = angVel;
-
-            // --- 5. Apply braking ---
-            if (isBraking)
-                rb.linearVelocity *= 0.95f;
         }
 
         // --- Client-side fork smoothing ---

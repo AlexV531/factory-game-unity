@@ -257,8 +257,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 0
+  UseRigidBodyForMotion: 1
+  AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
 --- !u!1 &3710599602106560500
 GameObject:
@@ -491,7 +491,7 @@ MonoBehaviour:
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
   UseRigidBodyForMotion: 1
-  AutoUpdateKinematicState: 0
+  AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &1601730636459082325
 MonoBehaviour:

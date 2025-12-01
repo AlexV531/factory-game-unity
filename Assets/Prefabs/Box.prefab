@@ -206,9 +206,9 @@ MonoBehaviour:
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
-  PositionMaxInterpolationTime: 0.04
+  PositionMaxInterpolationTime: 0.01
   RotationLerpSmoothing: 1
-  RotationMaxInterpolationTime: 0.04
+  RotationMaxInterpolationTime: 0.01
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 0
@@ -223,7 +223,7 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.001
+  PositionThreshold: 0.01
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
@@ -247,7 +247,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 1
+  UseRigidBodyForMotion: 0
   AutoUpdateKinematicState: 0
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &2239836110167024736

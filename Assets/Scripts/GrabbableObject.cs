@@ -10,6 +10,7 @@ public class GrabbableObject : NetworkBehaviour
     public float maxGrabForce = 100f;
     public float dragWhenGrabbed = 5f;
     public float maxGrabDistance = 2f; // Auto-release if beyond this distance
+    public Transform grabTransform;
 
     // Network list of grabber client IDs
     private NetworkList<ulong> grabberClientIds;
@@ -133,7 +134,6 @@ public class GrabbableObject : NetworkBehaviour
 
     void FixedUpdate()
     {
-        // Only server handles physics
         if (!IsServer) return;
 
         if (grabberClientIds.Count > 0)
@@ -170,10 +170,13 @@ public class GrabbableObject : NetworkBehaviour
                 }
             }
 
-            // Remove grabbers that are too far or invalid
-            foreach (var clientId in grabbersToRemove)
+            if (IsServer)
             {
-                RemoveGrabber(clientId);
+                // Remove grabbers that are too far or invalid
+                foreach (var clientId in grabbersToRemove)
+                {
+                    RemoveGrabber(clientId);
+                }
             }
 
             if (validGrabPoints > 0)
@@ -194,7 +197,10 @@ public class GrabbableObject : NetworkBehaviour
                 Vector3 totalForce = springForce + dampingForce;
                 totalForce = Vector3.ClampMagnitude(totalForce, maxGrabForce);
 
-                rb.AddForce(totalForce);
+                if (grabTransform != null)
+                    rb.AddForceAtPosition(totalForce, grabTransform.position);
+                else
+                    rb.AddForce(totalForce);
 
                 // Dampen angular velocity
                 rb.angularVelocity *= 0.95f;

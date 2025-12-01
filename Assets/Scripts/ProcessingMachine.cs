@@ -22,6 +22,20 @@ public class ProcessingMachine : Machine
         0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server
     );
 
+    public override void OnNetworkSpawn()
+    {
+        base.OnNetworkSpawn();
+
+        CurrentNumInputs.OnValueChanged += HandleNumInputsChanged;
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+
+        CurrentNumInputs.OnValueChanged -= HandleNumInputsChanged;
+    }
+
     public virtual void InputItem(int productCode)
     {
         CurrentNumInputs.Value++;

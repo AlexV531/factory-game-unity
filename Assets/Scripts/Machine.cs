@@ -19,7 +19,16 @@ public class Machine : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
+        PoweredOn.OnValueChanged += HandlePoweredChanged;
+
         PowerOn();
+    }
+
+    public override void OnNetworkDespawn()
+    {
+        base.OnNetworkDespawn();
+
+        PoweredOn.OnValueChanged -= HandlePoweredChanged;
     }
 
     public void TogglePowerToMachine()
