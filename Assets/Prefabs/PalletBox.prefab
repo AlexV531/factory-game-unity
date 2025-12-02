@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 8472889231312666990}
   - component: {fileID: 2224482674407411625}
   - component: {fileID: 4153355702655290858}
-  - component: {fileID: 8913340400781639366}
-  - component: {fileID: 4198852077448882376}
+  - component: {fileID: 4833635064832438174}
+  - component: {fileID: -9066597161506184400}
   - component: {fileID: 2541128558672130133}
   m_Layer: 7
   m_Name: PalletBox
@@ -189,11 +189,7 @@ MonoBehaviour:
   dragWhenGrabbed: 5
   maxGrabDistance: 2
   grabTransform: {fileID: 0}
-  edgePoint1: {fileID: 0}
-  edgePoint2: {fileID: 0}
-  snapDistance: 0.3
-  snapStrength: 0.5
---- !u!114 &8913340400781639366
+--- !u!114 &4833635064832438174
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -202,11 +198,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 1678499711189030655}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: da52bf8bbc1de48cfb221a6ff30f7972, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  m_EditorClassIdentifier: Unity.Multiplayer.Center.NetcodeForGameObjectsExample::Unity.Multiplayer.Center.NetcodeForGameObjectsExample.ClientNetworkTransform
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -217,7 +213,7 @@ MonoBehaviour:
   RotationMaxInterpolationTime: 0.04
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -229,7 +225,7 @@ MonoBehaviour:
   SyncScaleX: 0
   SyncScaleY: 0
   SyncScaleZ: 0
-  PositionThreshold: 0.01
+  PositionThreshold: 0.001
   RotAngleThreshold: 0.01
   ScaleThreshold: 0.01
   UseQuaternionSynchronization: 0
@@ -239,7 +235,7 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &4198852077448882376
+--- !u!114 &-9066597161506184400
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -253,8 +249,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkRigidbody
   ShowTopMostFoldoutHeaderGroup: 1
   NetworkRigidbodyBaseExpanded: 0
-  UseRigidBodyForMotion: 0
-  AutoUpdateKinematicState: 0
+  UseRigidBodyForMotion: 1
+  AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
 --- !u!114 &2541128558672130133
 MonoBehaviour:

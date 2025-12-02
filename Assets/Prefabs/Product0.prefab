@@ -15,9 +15,9 @@ GameObject:
   - component: {fileID: 3538533272270154853}
   - component: {fileID: 4123464326705025567}
   - component: {fileID: 3415090292515742731}
-  - component: {fileID: 244654547332756762}
-  - component: {fileID: 3723021361971189558}
   - component: {fileID: 2428596275571777915}
+  - component: {fileID: -198495006562218551}
+  - component: {fileID: -8332865444801035006}
   m_Layer: 7
   m_Name: Product0
   m_TagString: Untagged
@@ -187,7 +187,8 @@ MonoBehaviour:
   maxGrabForce: 1000
   dragWhenGrabbed: 5
   maxGrabDistance: 2
---- !u!114 &244654547332756762
+  grabTransform: {fileID: 0}
+--- !u!114 &2428596275571777915
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -196,11 +197,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 877202035252064431}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: 0b536e9bafe046542956c48963ea1aef, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  m_EditorClassIdentifier: Assembly-CSharp::Product
+  productCode: 0
+--- !u!114 &-198495006562218551
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 877202035252064431}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: da52bf8bbc1de48cfb221a6ff30f7972, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Unity.Multiplayer.Center.NetcodeForGameObjectsExample::Unity.Multiplayer.Center.NetcodeForGameObjectsExample.ClientNetworkTransform
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -211,7 +225,7 @@ MonoBehaviour:
   RotationMaxInterpolationTime: 0.04
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -233,7 +247,7 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &3723021361971189558
+--- !u!114 &-8332865444801035006
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -250,16 +264,3 @@ MonoBehaviour:
   UseRigidBodyForMotion: 1
   AutoUpdateKinematicState: 1
   AutoSetKinematicOnDespawn: 1
---- !u!114 &2428596275571777915
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 877202035252064431}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0b536e9bafe046542956c48963ea1aef, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Product
-  productCode: 0

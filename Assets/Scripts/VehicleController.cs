@@ -108,7 +108,7 @@ public class VehicleController : Interactable
         driverClientId.Value = clientId;
         currentDriver = player;
 
-        NetworkObject.ChangeOwnership(clientId);
+        // NetworkObject.ChangeOwnership(clientId);
 
         NotifyEnterVehicleClientRpc(clientId);
     }
@@ -123,7 +123,7 @@ public class VehicleController : Interactable
         moveInput = Vector2.zero;
         forkInput = 0f;
 
-        NetworkObject.RemoveOwnership();
+        // NetworkObject.RemoveOwnership();
 
         NotifyExitVehicleClientRpc(exitingClientId);
     }
@@ -209,24 +209,23 @@ public class VehicleController : Interactable
     {
         moveInput = move;
         forkInput = fork;
-        SendVehicleInputClientRpc(move, fork);
+        // SendVehicleInputClientRpc(move, fork);
     }
 
-    [ClientRpc]
-    private void SendVehicleInputClientRpc(Vector2 move, float fork)
-    {
-        moveInput = move;
-        forkInput = fork;
-    }
+    // [ClientRpc]
+    // private void SendVehicleInputClientRpc(Vector2 move, float fork)
+    // {
+    //     moveInput = move;
+    //     forkInput = fork;
+    // }
 
     private void FixedUpdate()
     {
         if (!HasDriver()) return;
 
-        // if (IsServer)
-        if (true)
+        if (IsServer)
         {
-            // --- 1. Update fork height first ---
+            // Update fork height
             if (forks != null)
             {
                 // Compute new height
@@ -241,20 +240,12 @@ public class VehicleController : Interactable
                 forksJoint.targetPosition = tp;
             }
 
-            // --- 2. Adjust center of mass dynamically ---
-            // Vector3 baseCoM = new Vector3(0, -0.5f, 0);
-            // Lower CoM slightly as forks go up for stability
-            // rb.centerOfMass = baseCoM - new Vector3(0,  * 0.01f, 0);
-
-            // --- 3. Apply forward/backward force ---
+            // Apply forward/backward force
             float forwardSpeed = Vector3.Dot(rb.linearVelocity, transform.forward);
             if (Mathf.Abs(forwardSpeed) < maxSpeed)
                 rb.AddForce(transform.forward * moveInput.y * motorForce, ForceMode.Acceleration);
-            
-            // Debug.Log("forwardSpeed " + forwardSpeed + " maxSpeed " + maxSpeed);
-            // Debug.Log("moveInput.y " + moveInput.y + " motorForce " + motorForce);
 
-            // --- 4. Apply turning torque ---
+            // Apply turning torque
             float speedFactor = Mathf.Lerp(minTurnSpeedFactor, 1f, Mathf.InverseLerp(0f, maxSpeed, Mathf.Abs(forwardSpeed)));
             float turnTorque = moveInput.x * turnSpeed;
 
@@ -264,7 +255,7 @@ public class VehicleController : Interactable
 
             rb.AddTorque(Vector3.up * turnTorque * rb.mass * 0.1f, ForceMode.Force);
 
-            // Optional: clamp angular velocity to prevent runaway spin
+            // Clamp angular velocity to prevent runaway spin
             Vector3 angVel = rb.angularVelocity;
             angVel.y = Mathf.Clamp(angVel.y, -1f, 1f); 
             rb.angularVelocity = angVel;

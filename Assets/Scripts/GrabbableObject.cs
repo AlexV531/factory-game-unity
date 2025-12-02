@@ -15,8 +15,12 @@ public class GrabbableObject : NetworkBehaviour
     // Network list of grabber client IDs
     private NetworkList<ulong> grabberClientIds;
 
-    // Dictionary to track grab points (server-side only)
+    // Dictionary to track grab points on server
     private Dictionary<ulong, Transform> grabPointsDict = new Dictionary<ulong, Transform>();
+
+    // Track the original owner
+    private ulong originalOwnerId;
+    private bool ownershipTransferred = false;
 
     private Rigidbody rb;
     private float originalLinearDamping;
@@ -32,10 +36,18 @@ public class GrabbableObject : NetworkBehaviour
     {
         base.OnNetworkSpawn();
 
+        if (IsServer)
+        {
+            originalOwnerId = OwnerClientId;
+        }
+
         if (rb != null)
         {
             originalLinearDamping = rb.linearDamping;
             originalAngularDamping = rb.angularDamping;
+            
+            // Only owner simulates physics
+            rb.isKinematic = !IsOwner;
         }
 
         // Subscribe to list changes to update damping
@@ -49,9 +61,10 @@ public class GrabbableObject : NetworkBehaviour
 
     void OnGrabberListChanged(NetworkListEvent<ulong> changeEvent)
     {
+        // Only owner updates damping
+        if (!IsOwner || rb == null) return;
+        
         // Update damping based on whether object is grabbed
-        if (!IsServer) return;
-
         if (grabberClientIds.Count > 0 && changeEvent.Type == NetworkListEvent<ulong>.EventType.Add)
         {
             rb.linearDamping = dragWhenGrabbed;
@@ -76,6 +89,13 @@ public class GrabbableObject : NetworkBehaviour
             grabberClientIds.Add(clientId);
             grabPointsDict[clientId] = grabPoint;
 
+            // Transfer ownership to first grabber
+            if (grabberClientIds.Count == 1 && !ownershipTransferred)
+            {
+                NetworkObject.ChangeOwnership(clientId);
+                ownershipTransferred = true;
+            }
+
             // Notify the client that grab was successful
             NotifyGrabClientRpc(clientId);
         }
@@ -90,6 +110,18 @@ public class GrabbableObject : NetworkBehaviour
         {
             grabberClientIds.Remove(clientId);
             grabPointsDict.Remove(clientId);
+
+            // If this was the owner and there are other grabbers, transfer to next grabber
+            if (clientId == OwnerClientId && grabberClientIds.Count > 0)
+            {
+                NetworkObject.ChangeOwnership(grabberClientIds[0]);
+            }
+            // If no more grabbers, return to original owner
+            else if (grabberClientIds.Count == 0)
+            {
+                NetworkObject.ChangeOwnership(originalOwnerId);
+                ownershipTransferred = false;
+            }
 
             // Notify the client that release was successful
             NotifyReleaseClientRpc(clientId);
@@ -134,77 +166,101 @@ public class GrabbableObject : NetworkBehaviour
 
     void FixedUpdate()
     {
-        if (!IsServer) return;
-
-        if (grabberClientIds.Count > 0)
+        // Server checks distance and removes grabbers if needed
+        if (IsServer)
         {
-            // Average the target positions of all grabbers
-            Vector3 averageTarget = Vector3.zero;
-            int validGrabPoints = 0;
-            List<ulong> grabbersToRemove = new List<ulong>();
+            CheckGrabberDistances();
+        }
 
-            foreach (var clientId in grabberClientIds)
+        // Owner controls physics
+        if (IsOwner && grabberClientIds.Count > 0)
+        {
+            ApplyGrabForces();
+        }
+    }
+
+    void CheckGrabberDistances()
+    {
+        if (grabberClientIds.Count == 0) return;
+
+        List<ulong> grabbersToRemove = new List<ulong>();
+
+        foreach (var clientId in grabberClientIds)
+        {
+            if (grabPointsDict.TryGetValue(clientId, out Transform grabPoint))
             {
-                if (grabPointsDict.TryGetValue(clientId, out Transform grabPoint))
+                if (grabPoint != null)
                 {
-                    if (grabPoint != null)
-                    {
-                        float distance = Vector3.Distance(grabPoint.position, transform.position);
+                    float distance = Vector3.Distance(grabPoint.position, transform.position);
 
-                        // Check if too far - mark for removal
-                        if (distance > maxGrabDistance)
-                        {
-                            grabbersToRemove.Add(clientId);
-                        }
-                        else
-                        {
-                            averageTarget += grabPoint.position;
-                            validGrabPoints++;
-                        }
-                    }
-                    else
+                    // Check if too far - mark for removal
+                    if (distance > maxGrabDistance)
                     {
-                        // Grab point no longer exists, remove grabber
                         grabbersToRemove.Add(clientId);
                     }
                 }
-            }
-
-            if (IsServer)
-            {
-                // Remove grabbers that are too far or invalid
-                foreach (var clientId in grabbersToRemove)
+                else
                 {
-                    RemoveGrabber(clientId);
+                    // Grab point no longer exists, remove grabber
+                    grabbersToRemove.Add(clientId);
                 }
             }
+        }
 
-            if (validGrabPoints > 0)
+        // Remove grabbers that are too far or invalid
+        foreach (var clientId in grabbersToRemove)
+        {
+            RemoveGrabber(clientId);
+        }
+    }
+
+    void ApplyGrabForces()
+    {
+        // Find all PlayerInteracter components to get grab points
+        PlayerInteracter[] interacters = FindObjectsByType<PlayerInteracter>(FindObjectsSortMode.None);
+
+        Vector3 averageTarget = Vector3.zero;
+        int validGrabPoints = 0;
+
+        foreach (var clientId in grabberClientIds)
+        {
+            // Find the PlayerInteracter for this client
+            foreach (var interacter in interacters)
             {
-                averageTarget /= validGrabPoints;
-
-                // Calculate direction and distance
-                Vector3 direction = averageTarget - transform.position;
-                float distance = direction.magnitude;
-
-                // Spring force
-                Vector3 springForce = direction.normalized * (distance * grabForceMultiplier);
-
-                // Damping force
-                Vector3 dampingForce = -rb.linearVelocity * dampingMultiplier;
-
-                // Combine and clamp
-                Vector3 totalForce = springForce + dampingForce;
-                totalForce = Vector3.ClampMagnitude(totalForce, maxGrabForce);
-
-                if (grabTransform != null)
-                    rb.AddForceAtPosition(totalForce, grabTransform.position);
-                else
-                    rb.AddForce(totalForce);
-
-                // Dampen angular velocity
-                rb.angularVelocity *= 0.95f;
+                if (interacter.OwnerClientId == clientId && interacter.grabPoint != null)
+                {
+                    averageTarget += interacter.grabPoint.position;
+                    validGrabPoints++;
+                    break;
+                }
             }
+        }
+
+        if (validGrabPoints > 0)
+        {
+            averageTarget /= validGrabPoints;
+
+            // Calculate direction and distance
+            Vector3 direction = averageTarget - transform.position;
+            float distance = direction.magnitude;
+
+            // Spring force
+            Vector3 springForce = direction.normalized * (distance * grabForceMultiplier);
+
+            // Damping force
+            Vector3 dampingForce = -rb.linearVelocity * dampingMultiplier;
+
+            // Combine and clamp
+            Vector3 totalForce = springForce + dampingForce;
+            totalForce = Vector3.ClampMagnitude(totalForce, maxGrabForce);
+
+            if (grabTransform != null)
+                rb.AddForceAtPosition(totalForce, grabTransform.position);
+            else
+                rb.AddForce(totalForce);
+
+            // Dampen angular velocity
+            rb.angularVelocity *= 0.95f;
         }
     }
 }

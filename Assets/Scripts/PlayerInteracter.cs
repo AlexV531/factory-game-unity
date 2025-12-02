@@ -43,6 +43,7 @@ public class PlayerInteracter : NetworkBehaviour
                 NetworkObject netObj = grobject.GetComponentInParent<NetworkObject>();
                 if (netObj != null)
                 {
+                    Debug.Log("Grabbable object Network object component found");
                     // Get the path from the NetworkObject to this specific child
                     string childPath = GetRelativePath(netObj.transform, grobject.transform);
                     RequestGrabServerRpc(netObj.NetworkObjectId, childPath);
@@ -108,24 +109,27 @@ public class PlayerInteracter : NetworkBehaviour
         return parent.Find(path);
     }
 
-    [ServerRpc]
+    [Rpc(SendTo.Server)]
     void RequestGrabServerRpc(ulong objectId, string childPath)
     {
+        Debug.Log("Grab server rpc called");
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))
         {
             Transform targetTransform = FindChildByPath(netObj.transform, childPath);
             if (targetTransform != null)
             {
+                Debug.Log("Target transform found");
                 GrabbableObject grabbable = targetTransform.GetComponent<GrabbableObject>();
                 if (grabbable != null)
                 {
+                    Debug.Log("Grabbable object component found by server");
                     grabbable.AddGrabber(OwnerClientId, grabPoint);
                 }
             }
         }
     }
 
-    [ServerRpc]
+    [Rpc(SendTo.Server)]
     void RequestReleaseServerRpc(ulong objectId, string childPath)
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))
@@ -142,7 +146,7 @@ public class PlayerInteracter : NetworkBehaviour
         }
     }
 
-    [ServerRpc]
+    [Rpc(SendTo.Server)]
     void RequestInteractServerRpc(ulong objectId, string childPath)
     {
         if (NetworkManager.Singleton.SpawnManager.SpawnedObjects.TryGetValue(objectId, out NetworkObject netObj))

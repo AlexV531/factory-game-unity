@@ -15,8 +15,8 @@ GameObject:
   - component: {fileID: 2811995567977793274}
   - component: {fileID: 2031271635283994657}
   - component: {fileID: 5856361190873319549}
-  - component: {fileID: 1332371894266582947}
-  - component: {fileID: 4902730752778139640}
+  - component: {fileID: 7595833275203231084}
+  - component: {fileID: 8873865646526924978}
   - component: {fileID: 3095020382814938641}
   m_Layer: 7
   m_Name: Slag
@@ -187,7 +187,8 @@ MonoBehaviour:
   maxGrabForce: 1000
   dragWhenGrabbed: 5
   maxGrabDistance: 2
---- !u!114 &1332371894266582947
+  grabTransform: {fileID: 0}
+--- !u!114 &7595833275203231084
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -196,11 +197,11 @@ MonoBehaviour:
   m_GameObject: {fileID: 3832737428212051428}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e96cb6065543e43c4a752faaa1468eb1, type: 3}
+  m_Script: {fileID: 11500000, guid: da52bf8bbc1de48cfb221a6ff30f7972, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Unity.Netcode.Runtime::Unity.Netcode.Components.NetworkTransform
+  m_EditorClassIdentifier: Unity.Multiplayer.Center.NetcodeForGameObjectsExample::Unity.Multiplayer.Center.NetcodeForGameObjectsExample.ClientNetworkTransform
   ShowTopMostFoldoutHeaderGroup: 1
-  NetworkTransformExpanded: 0
+  NetworkTransformExpanded: 1
   AutoOwnerAuthorityTickOffset: 1
   PositionInterpolationType: 0
   RotationInterpolationType: 0
@@ -211,7 +212,7 @@ MonoBehaviour:
   RotationMaxInterpolationTime: 0.04
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
-  AuthorityMode: 0
+  AuthorityMode: 1
   TickSyncChildren: 0
   UseUnreliableDeltas: 0
   SyncPositionX: 1
@@ -233,7 +234,7 @@ MonoBehaviour:
   SwitchTransformSpaceWhenParented: 0
   Interpolate: 1
   SlerpPosition: 0
---- !u!114 &4902730752778139640
+--- !u!114 &8873865646526924978
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
