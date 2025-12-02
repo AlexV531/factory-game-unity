@@ -1,46 +1,97 @@
 using UnityEngine;
+using System.Collections;
 
 public class TrainController : MonoBehaviour
 {
-    public Transform[] points;
-    public float speed = 5f;
-    public float stopDuration = 2f;
+    [Header("Points")]
+    public Transform startPoint;
+    public Transform stopPoint;
+    public Transform endPoint;
 
-    private int currentPointIndex = 0;
-    private bool isStopping = false;
+    [Header("Timing")]
+    public float speed = 20f;
+    public float stopDuration = 5f;
+    public float processCycleTime = 30f; // Time between each process start
 
-    void Update()
+    [Header("Auto Start")]
+    public bool autoStart = true;
+
+    private bool isProcessRunning = false;
+    private float nextProcessTime = 0f;
+
+    void Start()
     {
-        if (points.Length == 0 || isStopping) return;
-
-        Transform target = points[currentPointIndex];
-        transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
-
-        // Optional: rotate to face movement direction
-        Vector3 direction = (target.position - transform.position).normalized;
-        if (direction != Vector3.zero)
-            transform.rotation = Quaternion.LookRotation(direction);
-
-        // Check if we've reached the current point
-        if (Vector3.Distance(transform.position, target.position) < 0.01f)
+        if (autoStart && startPoint != null)
         {
-            StartCoroutine(HandleStopAtPoint());
+            transform.position = startPoint.position;
+            nextProcessTime = Time.time + processCycleTime;
         }
     }
 
-    System.Collections.IEnumerator HandleStopAtPoint()
+    void Update()
     {
-        isStopping = true;
+        if (!autoStart) return;
 
-        if (currentPointIndex == 0)
-            yield return new WaitForSeconds(stopDuration);
+        if (!isProcessRunning && Time.time >= nextProcessTime)
+        {
+            StartCoroutine(RunProcess());
+        }
+    }
 
-        currentPointIndex++;
+    public void ManualStartProcess()
+    {
+        if (!isProcessRunning)
+        {
+            StartCoroutine(RunProcess());
+        }
+    }
 
-        // Clamp to avoid going out of bounds
-        if (currentPointIndex >= points.Length)
-            currentPointIndex = points.Length - 1; // Stop at the last point
+    private IEnumerator RunProcess()
+    {
+        isProcessRunning = true;
 
-        isStopping = false;
+        Debug.Log("Process started.");
+
+        // Teleport to start point
+        if (startPoint != null)
+            transform.position = startPoint.position;
+        Debug.Log("Moved to start point.");
+
+        // Move to stop point
+        yield return StartCoroutine(MoveToPoint(stopPoint));
+        Debug.Log("Moved to stop point.");
+
+        // Stop at the stop point
+        yield return new WaitForSeconds(stopDuration);
+
+        // Move to end point
+        yield return StartCoroutine(MoveToPoint(endPoint));
+        Debug.Log("Moved to end point.");
+
+        // Process complete, schedule next one
+        nextProcessTime = Time.time + processCycleTime;
+        isProcessRunning = false;
+    }
+
+    private IEnumerator MoveToPoint(Transform target)
+    {
+        if (target == null) yield break;
+
+        while (Vector3.Distance(transform.position, target.position) > 0.01f)
+        {
+            Debug.Log("Moving");
+
+            transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
+
+            // Rotate to face movement direction
+            Vector3 direction = (target.position - transform.position).normalized;
+            if (direction != Vector3.zero)
+                transform.rotation = Quaternion.LookRotation(direction);
+
+            yield return null;
+        }
+
+        // Snap to exact position
+        transform.position = target.position;
     }
 }

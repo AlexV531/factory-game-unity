@@ -133,7 +133,7 @@ public class SnappingJoinedObject : NetworkBehaviour
         // If close enough to an edge, set joint target and enable drives
         if (foundValidEdge && closestDistance <= snapDistance)
         {
-            Debug.Log("within snapping distance");
+            // Debug.Log("within snapping distance");
 
             // Enable drives if they're disabled
             if (drivesDisabled)
@@ -223,7 +223,7 @@ public class SnappingJoinedObject : NetworkBehaviour
         // If close enough to a rotation target, set joint target and enable angular drives
         if (foundValidRotation && smallestAngle <= rotationSnapAngle)
         {
-            Debug.Log("within rotation snapping angle");
+            // Debug.Log("within rotation snapping angle");
 
             // Enable angular drives if they're disabled
             if (angularDrivesDisabled)
