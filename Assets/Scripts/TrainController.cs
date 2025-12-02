@@ -50,23 +50,23 @@ public class TrainController : MonoBehaviour
     {
         isProcessRunning = true;
 
-        Debug.Log("Process started.");
+        // Debug.Log("Process started.");
 
         // Teleport to start point
         if (startPoint != null)
             transform.position = startPoint.position;
-        Debug.Log("Moved to start point.");
+        // Debug.Log("Moved to start point.");
 
         // Move to stop point
         yield return StartCoroutine(MoveToPoint(stopPoint));
-        Debug.Log("Moved to stop point.");
+        // Debug.Log("Moved to stop point.");
 
         // Stop at the stop point
         yield return new WaitForSeconds(stopDuration);
 
         // Move to end point
         yield return StartCoroutine(MoveToPoint(endPoint));
-        Debug.Log("Moved to end point.");
+        // Debug.Log("Moved to end point.");
 
         // Process complete, schedule next one
         nextProcessTime = Time.time + processCycleTime;
@@ -79,7 +79,7 @@ public class TrainController : MonoBehaviour
 
         while (Vector3.Distance(transform.position, target.position) > 0.01f)
         {
-            Debug.Log("Moving");
+            // Debug.Log("Moving");
 
             transform.position = Vector3.MoveTowards(transform.position, target.position, speed * Time.deltaTime);
 
