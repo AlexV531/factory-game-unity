@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class Machine : NetworkBehaviour
 {
     public string machineName;
-    public AssemblyLineManager assemblyLineManager;
+    // public AssemblyLineManager assemblyLineManager;
 
     // Use a NetworkVariable to sync powered state
     public NetworkVariable<bool> PoweredOn = new NetworkVariable<bool>(
@@ -49,7 +49,7 @@ public class Machine : NetworkBehaviour
     {
         if (!IsServer) return;
         PoweredOn.Value = false;
-        assemblyLineManager.StopAllBelts();
+        AssemblyLineManager.Instance.StopAllBelts();
     }
 
     public bool IsPoweredOn()
@@ -59,7 +59,7 @@ public class Machine : NetworkBehaviour
 
     public bool IsOperational()
     {
-        return PoweredOn.Value && assemblyLineManager.IsLineRunning();
+        return PoweredOn.Value && AssemblyLineManager.Instance.IsLineRunning();
     }
 
     private void OnEnable()

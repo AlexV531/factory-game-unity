@@ -1073,6 +1073,7 @@ MonoBehaviour:
   successColor: {r: 0, g: 1, b: 0, a: 1}
   maxInteractionDistance: 5
   playerActionMapName: Player
+  terminalActionMapName: Terminal
 --- !u!1001 &115088235
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -1406,7 +1407,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MachineA
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Metal Former
-  assemblyLineManager: {fileID: 1565219548}
   PoweredOn:
     m_InternalValue: 0
   OnPoweredChanged:
@@ -3401,10 +3401,10 @@ RectTransform:
   m_Children: []
   m_Father: {fileID: 193741601}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
-  m_AnchorMin: {x: 0, y: 1}
-  m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 437.05, y: -227.095}
-  m_SizeDelta: {x: 874.1, y: 454.19}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &500340862
 MonoBehaviour:
@@ -6214,7 +6214,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MachineA
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Electrolysis Bath
-  assemblyLineManager: {fileID: 1565219548}
   PoweredOn:
     m_InternalValue: 0
   OnPoweredChanged:
@@ -7581,7 +7580,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MaterialRequiredMachine
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Metal Melter
-  assemblyLineManager: {fileID: 1565219548}
   PoweredOn:
     m_InternalValue: 1
   OnPoweredChanged:
@@ -12785,7 +12783,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PackingMachine
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Packing Machine
-  assemblyLineManager: {fileID: 1565219548}
   PoweredOn:
     m_InternalValue: 1
   OnPoweredChanged:

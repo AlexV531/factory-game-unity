@@ -4,6 +4,8 @@ using System.Collections;
 
 public class AssemblyLineManager : NetworkBehaviour
 {
+    public static AssemblyLineManager Instance { get; private set; }
+
     [SerializeField] private float rampUpTime = 3f; // Time to reach full speed
 
     private ConveyorBelt[] conveyorBelts;
@@ -12,6 +14,19 @@ public class AssemblyLineManager : NetworkBehaviour
     private bool beltsRunning = true;
 
     private Machine[] machines; // Track all machines
+
+    private void Awake()
+    {
+        // Singleton setup
+        if (Instance != null && Instance != this)
+        {
+            Debug.LogWarning("Duplicate AssemblyLineManager found and destroyed.");
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+    }
 
     private void Start()
     {
