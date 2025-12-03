@@ -93,11 +93,11 @@ public class PhysicsPlayerController : NetworkBehaviour
         }
 
         // Unlock cursor with Escape
-        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
-        {
-            Cursor.lockState = CursorLockMode.None;
-            Cursor.visible = true;
-        }
+        // if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        // {
+        //     Cursor.lockState = CursorLockMode.None;
+        //     Cursor.visible = true;
+        // }
     }
 
     void FixedUpdate()

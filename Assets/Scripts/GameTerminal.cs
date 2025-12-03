@@ -22,6 +22,7 @@ public class GameTerminal : Interactable
     [Header("Interaction Settings")]
     public float maxInteractionDistance = 5f;
     public string playerActionMapName = "Player";
+    public string terminalActionMapName = "Terminal";
 
     private List<string> outputLines = new List<string>();
     private List<string> commandHistory = new List<string>();
@@ -120,16 +121,12 @@ public class GameTerminal : Interactable
                 {
                     activePlayerTransform = client.PlayerObject.transform;
 
-                    // Disable player action map
+                    // Switch to Look action map
                     var playerInput = client.PlayerObject.GetComponent<PlayerInput>();
                     if (playerInput != null)
                     {
                         previousActionMap = playerInput.currentActionMap;
-                        var actionMap = playerInput.actions.FindActionMap(playerActionMapName);
-                        if (actionMap != null)
-                        {
-                            actionMap.Disable();
-                        }
+                        playerInput.SwitchCurrentActionMap(terminalActionMapName);
                     }
                     break;
                 }
@@ -147,25 +144,21 @@ public class GameTerminal : Interactable
             inputField.ActivateInputField();
         }
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        // Cursor.lockState = CursorLockMode.None;
+        // Cursor.visible = true;
     }
 
     void DeactivateTerminal()
     {
         isActive = false;
 
-        // Re-enable player action map
+        // Switch back to Player action map
         if (NetworkManager.Singleton != null && activePlayerTransform != null)
         {
             var playerInput = activePlayerTransform.GetComponent<PlayerInput>();
             if (playerInput != null)
             {
-                var actionMap = playerInput.actions.FindActionMap(playerActionMapName);
-                if (actionMap != null)
-                {
-                    actionMap.Enable();
-                }
+                playerInput.SwitchCurrentActionMap(playerActionMapName);
             }
         }
 
@@ -176,8 +169,8 @@ public class GameTerminal : Interactable
             terminalCanvas.gameObject.SetActive(false);
         }
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.visible = false;
     }
 
     void OnSubmit(string command)
