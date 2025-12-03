@@ -30,6 +30,13 @@ public class GrabbableObject : NetworkBehaviour
     {
         grabberClientIds = new NetworkList<ulong>();
         rb = GetComponent<Rigidbody>();
+        
+        // Capture original damping values immediately
+        if (rb != null)
+        {
+            originalLinearDamping = rb.linearDamping;
+            originalAngularDamping = rb.angularDamping;
+        }
     }
 
     public override void OnNetworkSpawn()
@@ -41,15 +48,6 @@ public class GrabbableObject : NetworkBehaviour
             originalOwnerId = OwnerClientId;
         }
 
-        if (rb != null)
-        {
-            originalLinearDamping = rb.linearDamping;
-            originalAngularDamping = rb.angularDamping;
-            
-            // Only owner simulates physics
-            rb.isKinematic = !IsOwner;
-        }
-
         // Subscribe to list changes to update damping
         grabberClientIds.OnListChanged += OnGrabberListChanged;
     }
@@ -57,6 +55,28 @@ public class GrabbableObject : NetworkBehaviour
     public override void OnNetworkDespawn()
     {
         grabberClientIds.OnListChanged -= OnGrabberListChanged;
+    }
+
+    public override void OnGainedOwnership()
+    {
+        base.OnGainedOwnership();
+        
+        // Ensure damping is correct based on grab state when we gain ownership
+        if (rb != null)
+        {
+            if (grabberClientIds.Count > 0)
+            {
+                rb.linearDamping = dragWhenGrabbed;
+                rb.angularDamping = dragWhenGrabbed;
+                Debug.Log($"Gained ownership (grabbed) - Damping set to {dragWhenGrabbed}");
+            }
+            else
+            {
+                rb.linearDamping = originalLinearDamping;
+                rb.angularDamping = originalAngularDamping;
+                Debug.Log($"Gained ownership (released) - Damping reset to Linear: {originalLinearDamping}, Angular: {originalAngularDamping}");
+            }
+        }
     }
 
     void OnGrabberListChanged(NetworkListEvent<ulong> changeEvent)
@@ -69,11 +89,13 @@ public class GrabbableObject : NetworkBehaviour
         {
             rb.linearDamping = dragWhenGrabbed;
             rb.angularDamping = dragWhenGrabbed;
+            Debug.Log($"Grabbed - Set damping to {dragWhenGrabbed}");
         }
         else if (grabberClientIds.Count == 0)
         {
             rb.linearDamping = originalLinearDamping;
             rb.angularDamping = originalAngularDamping;
+            Debug.Log($"Released - Reset damping to Linear: {originalLinearDamping}, Angular: {originalAngularDamping}");
         }
     }
 
