@@ -235,8 +235,8 @@ public class GameTerminal : Interactable
             inputField.ActivateInputField();
         }
 
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
+        // Cursor.lockState = CursorLockMode.None;
+        // Cursor.visible = true;
     }
 
     void DeactivateTerminal()
@@ -260,8 +260,8 @@ public class GameTerminal : Interactable
             terminalCanvas.gameObject.SetActive(false);
         }
 
-        Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
+        // Cursor.lockState = CursorLockMode.Locked;
+        // Cursor.visible = false;
     }
 
     void OnSubmit(string command)
