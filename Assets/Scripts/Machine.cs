@@ -5,7 +5,7 @@ using UnityEngine.Events;
 public class Machine : NetworkBehaviour
 {
     public string machineName;
-    // public AssemblyLineManager assemblyLineManager;
+    public string machineId;
 
     // Use a NetworkVariable to sync powered state
     public NetworkVariable<bool> PoweredOn = new NetworkVariable<bool>(

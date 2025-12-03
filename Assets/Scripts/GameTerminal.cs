@@ -22,7 +22,7 @@ public class GameTerminal : Interactable
     [Header("Interaction Settings")]
     public float maxInteractionDistance = 5f;
     public string playerActionMapName = "Player";
-    public string terminalActionMapName = "Terminal";
+    public string terminalActionMapName = "Look";
 
     private List<string> outputLines = new List<string>();
     private List<string> commandHistory = new List<string>();
@@ -47,6 +47,97 @@ public class GameTerminal : Interactable
         }
 
         AddSystemMessage("Terminal v1.0 - Type 'help' for commands");
+        AddOutputLine("");
+    }
+
+    void DiagnoseMachine(string machineId)
+    {
+        // Find all machines
+        Machine[] machines = FindObjectsByType<Machine>(FindObjectsSortMode.None);
+        Machine targetMachine = null;
+
+        // Search for machine by name (case-insensitive)
+        foreach (Machine machine in machines)
+        {
+            if (machine != null && machine.machineId.Equals(machineId, System.StringComparison.OrdinalIgnoreCase))
+            {
+                targetMachine = machine;
+                break;
+            }
+        }
+
+        if (targetMachine == null)
+        {
+            AddErrorMessage($"Machine '{machineId}' not found");
+            AddOutputLine("Use 'status' command to see all machines");
+            return;
+        }
+
+        // Display machine diagnostics
+        AddSystemMessage($"=== Diagnostics: {targetMachine.machineId} ===");
+
+        // Power status
+        bool isPowered = targetMachine.IsPoweredOn();
+        if (isPowered)
+        {
+            AddSuccessMessage("Power: ONLINE");
+        }
+        else
+        {
+            AddErrorMessage("Power: OFFLINE");
+        }
+
+        // Get all Task components on the machine
+        Task[] tasks = targetMachine.GetComponents<Task>();
+
+        if (tasks.Length == 0)
+        {
+            AddOutputLine("No tasks configured");
+        }
+        else
+        {
+            AddOutputLine("");
+
+            // Count active tasks
+            int activeTaskCount = 0;
+            foreach (Task task in tasks)
+            {
+                if (task != null && task.IsActive)
+                {
+                    activeTaskCount++;
+                }
+            }
+
+            if (activeTaskCount == 0)
+            {
+                AddOutputLine("No active tasks");
+            }
+            else
+            {
+                AddSystemMessage($"Active Tasks ({activeTaskCount} total):");
+
+                foreach (Task task in tasks)
+                {
+                    if (task != null && task.IsActive)
+                    {
+                        string taskDisplayName = !string.IsNullOrEmpty(task.TaskName) ? task.TaskName : task.GetType().Name;
+
+                        AddOutputLine($"  [{taskDisplayName}] IN PROGRESS");
+                        if (task.TimeLimit > 0)
+                        {
+                            AddOutputLine($"    Time Remaining: {task.TimeRemaining:F1}s");
+                        }
+
+                        // Show description if available
+                        // if (!string.IsNullOrEmpty(task.TaskDescription))
+                        // {
+                        //     AddOutputLine($"    {task.TaskDescription}");
+                        // }
+                    }
+                }
+            }
+        }
+
         AddOutputLine("");
     }
 
@@ -144,8 +235,8 @@ public class GameTerminal : Interactable
             inputField.ActivateInputField();
         }
 
-        // Cursor.lockState = CursorLockMode.None;
-        // Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+        Cursor.visible = true;
     }
 
     void DeactivateTerminal()
@@ -169,8 +260,8 @@ public class GameTerminal : Interactable
             terminalCanvas.gameObject.SetActive(false);
         }
 
-        // Cursor.lockState = CursorLockMode.Locked;
-        // Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
+        Cursor.visible = false;
     }
 
     void OnSubmit(string command)
@@ -209,6 +300,8 @@ public class GameTerminal : Interactable
                 AddOutputLine("  clear - Clear the terminal");
                 AddOutputLine("  echo [text] - Echo back text");
                 AddOutputLine("  time - Display current time");
+                AddOutputLine("  status - Check assembly line status");
+                AddOutputLine("  diagnose [machine] - Detailed machine diagnostics");
                 AddOutputLine("  exit - Close terminal");
                 break;
 
@@ -232,6 +325,23 @@ public class GameTerminal : Interactable
                 AddOutputLine(System.DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
                 break;
 
+            case "status":
+                CheckAssemblyLineStatus();
+                break;
+
+            case "diagnose":
+                if (parts.Length > 1)
+                {
+                    string machineName = command.Substring(9).Trim();
+                    DiagnoseMachine(machineName);
+                }
+                else
+                {
+                    AddErrorMessage("Usage: diagnose [machine-name]");
+                    AddOutputLine("Example: diagnose press-a");
+                }
+                break;
+
             case "exit":
             case "quit":
                 DeactivateTerminal();
@@ -242,6 +352,68 @@ public class GameTerminal : Interactable
                 AddOutputLine("Type 'help' for available commands");
                 break;
         }
+    }
+
+    void CheckAssemblyLineStatus()
+    {
+        if (AssemblyLineManager.Instance == null)
+        {
+            AddErrorMessage("Assembly line manager not found");
+            return;
+        }
+
+        AddSystemMessage("=== Assembly Line Status ===");
+
+        // Check if line is running
+        bool isRunning = AssemblyLineManager.Instance.IsLineRunning();
+        if (isRunning)
+        {
+            AddSuccessMessage($"Line Status: RUNNING");
+        }
+        else
+        {
+            AddErrorMessage($"Line Status: STOPPED");
+        }
+
+        AddOutputLine("");
+
+        // List all machines individually
+        Machine[] machines = FindObjectsByType<Machine>(FindObjectsSortMode.None);
+        int poweredOffCount = 0;
+
+        AddSystemMessage($"Machines ({machines.Length} total):");
+
+        foreach (Machine machine in machines)
+        {
+            if (machine != null)
+            {
+                string machineId = machine.machineId;
+                bool isPowered = machine.IsPoweredOn();
+
+                if (isPowered)
+                {
+                    AddSuccessMessage($"  [{machineId}] ONLINE");
+                }
+                else
+                {
+                    AddErrorMessage($"  [{machineId}] OFFLINE");
+                    poweredOffCount++;
+                }
+            }
+        }
+
+        AddOutputLine("");
+
+        if (poweredOffCount > 0)
+        {
+            AddErrorMessage($"Warning: {poweredOffCount} machine(s) offline");
+        }
+        else
+        {
+            AddSuccessMessage("All systems operational");
+        }
+
+        AddOutputLine("");
     }
 
     public void AddOutputLine(string line)

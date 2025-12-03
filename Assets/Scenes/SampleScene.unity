@@ -1407,6 +1407,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MachineA
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Metal Former
+  machineId: former
   PoweredOn:
     m_InternalValue: 0
   OnPoweredChanged:
@@ -6214,6 +6215,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MachineA
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Electrolysis Bath
+  machineId: electrolysis
   PoweredOn:
     m_InternalValue: 0
   OnPoweredChanged:
@@ -7580,6 +7582,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::MaterialRequiredMachine
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Metal Melter
+  machineId: melter
   PoweredOn:
     m_InternalValue: 1
   OnPoweredChanged:
@@ -12783,6 +12786,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::PackingMachine
   ShowTopMostFoldoutHeaderGroup: 1
   machineName: Packing Machine
+  machineId: packer
   PoweredOn:
     m_InternalValue: 1
   OnPoweredChanged:
