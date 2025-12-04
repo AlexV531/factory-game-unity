@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 91efc09cbe5f4e348aee4e6da60d7302
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Dissonance/Integrations/Offline/Demo/Offline Demo Scene.unity
+  uploadId: 811004

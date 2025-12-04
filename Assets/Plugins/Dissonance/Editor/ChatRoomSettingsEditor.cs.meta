@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: c8a44c7f400921149ac98c853ce95f72
+timeCreated: 1468163008
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Editor/ChatRoomSettingsEditor.cs
+  uploadId: 811004

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: d15b46ef9f528544986af9a01b7b423c
+timeCreated: 1494431610
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Editor/DissonanceAecFilterInspector.cs
+  uploadId: 811004

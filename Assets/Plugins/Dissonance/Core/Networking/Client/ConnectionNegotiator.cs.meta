@@ -1,0 +1,10 @@
+﻿fileFormatVersion: 2
+guid: e4dc6a0ffd3341c98274f8a79e59f293
+timeCreated: 1501897687
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Networking/Client/ConnectionNegotiator.cs
+  uploadId: 811004

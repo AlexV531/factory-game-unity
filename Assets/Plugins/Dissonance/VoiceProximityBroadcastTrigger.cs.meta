@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 1a76c0688e4bd80499ffa3b6a2aed3f2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/VoiceProximityBroadcastTrigger.cs
+  uploadId: 811004

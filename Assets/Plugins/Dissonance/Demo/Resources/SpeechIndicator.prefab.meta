@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: fa1b60118046ea24296c108c093b0027
+timeCreated: 1496703117
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: -1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Demo/Resources/SpeechIndicator.prefab
+  uploadId: 811004

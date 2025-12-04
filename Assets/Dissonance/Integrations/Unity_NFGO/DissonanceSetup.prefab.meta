@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 2c50758a6d3b8114a8ce30a2fd9e4380
+PrefabImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 206514
+  packageName: Dissonance For Netcode For GameObjects
+  packageVersion: 9.0.2
+  assetPath: Assets/Dissonance/Integrations/Unity_NFGO/DissonanceSetup.prefab
+  uploadId: 763704

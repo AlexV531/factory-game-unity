@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 31d22712159157446b216a465743d577
+timeCreated: 1496674984
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: 100100000
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Demo/Body.prefab
+  uploadId: 811004

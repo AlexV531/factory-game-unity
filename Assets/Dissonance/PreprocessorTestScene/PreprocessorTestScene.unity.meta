@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 0df3cf3b6883fc647b2b16536e8e6542
+DefaultImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Dissonance/PreprocessorTestScene/PreprocessorTestScene.unity
+  uploadId: 811004

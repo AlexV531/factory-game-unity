@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 274c2faa89ccc144f930a49767e52bf4
+timeCreated: 1504406158
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Threading/LockedValue.cs
+  uploadId: 811004

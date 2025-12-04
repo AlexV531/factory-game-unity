@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: a66e462921a51e24996805fe6f9521af
+timeCreated: 1469122899
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Datastructures/WindowDeviationCalculator.cs
+  uploadId: 811004

@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: 5a5277652fc17ee439aec0a063a1e838
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 206514
+  packageName: Dissonance For Netcode For GameObjects
+  packageVersion: 9.0.2
+  assetPath: Assets/Dissonance/Integrations/Unity_NFGO/Demo/README.txt
+  uploadId: 763704

@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 06ab84b060dcddd438448f942e6fc7c1
+timeCreated: 1502477170
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Networking/Client/PacketRouter.cs
+  uploadId: 811004

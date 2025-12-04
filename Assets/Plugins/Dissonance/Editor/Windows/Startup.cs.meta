@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: caea274933fff704fbc0835b6371a8b0
+timeCreated: 1517847677
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Editor/Windows/Startup.cs
+  uploadId: 811004

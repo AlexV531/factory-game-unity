@@ -1,0 +1,19 @@
+fileFormatVersion: 2
+guid: 68cb6390db6a055489312a051b1eb781
+timeCreated: 1464275501
+licenseType: Store
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Audio/Capture/SpeexDspNative.cs
+  uploadId: 811004

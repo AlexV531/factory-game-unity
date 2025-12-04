@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 36d1a5a963de6e941aeccd6d87d3e55b
+timeCreated: 1496703117
+licenseType: Store
+NativeFormatImporter:
+  mainObjectFileID: -1
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Demo/Resources/IndicatorBallMaterial.mat
+  uploadId: 811004

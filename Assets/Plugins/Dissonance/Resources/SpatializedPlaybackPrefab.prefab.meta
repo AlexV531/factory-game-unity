@@ -1,0 +1,15 @@
+fileFormatVersion: 2
+guid: 1d5da08daf134aa41a83590aea0e4caa
+timeCreated: 1490122190
+licenseType: Store
+NativeFormatImporter:
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Resources/SpatializedPlaybackPrefab.prefab
+  uploadId: 811004

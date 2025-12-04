@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 451366ba90b089d498eba63282f3d502
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Dissonance/Integrations/Offline/OfflineCommsNetwork.cs
+  uploadId: 811004

@@ -113,11 +113,11 @@ public class PhysicsPlayerController : NetworkBehaviour
         //     Cursor.visible = true;
         // }
 
-        if (vehicle != null)
-        {
-            MoveWithVehicle();
-            return;
-        }
+        // if (vehicle != null)
+        // {
+        //     MoveWithVehicle();
+        //     return;
+        // }
 
         CheckGrounded();
         HandleMovement();
@@ -170,10 +170,10 @@ public class PhysicsPlayerController : NetworkBehaviour
         }
     }
 
-    void MoveWithVehicle()
-    {
-        // transform.position = vehicle.driverSeat.position;
-    }
+    // void MoveWithVehicle()
+    // {
+    //     transform.position = vehicle.driverSeat.position;
+    // }
 
     void HandleMenus()
 	{

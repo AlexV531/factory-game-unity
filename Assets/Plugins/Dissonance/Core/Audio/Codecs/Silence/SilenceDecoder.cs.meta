@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: a22b2aa2fe80eca479cfb59a3b315f22
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Audio/Codecs/Silence/SilenceDecoder.cs
+  uploadId: 811004

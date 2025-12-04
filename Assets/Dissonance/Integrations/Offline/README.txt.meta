@@ -1,0 +1,14 @@
+fileFormatVersion: 2
+guid: bde57cb637737694cb36c1e20faa88cb
+TextScriptImporter:
+  externalObjects: {}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Dissonance/Integrations/Offline/README.txt
+  uploadId: 811004

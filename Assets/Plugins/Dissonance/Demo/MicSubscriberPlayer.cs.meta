@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: 2aa8180aa64e0c74987db3587e9fecfb
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Demo/MicSubscriberPlayer.cs
+  uploadId: 811004

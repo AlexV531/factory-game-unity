@@ -1,0 +1,18 @@
+fileFormatVersion: 2
+guid: bb87a7d29aa46b94289698cd2cb549d2
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences: []
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 70078
+  packageName: Dissonance Voice Chat
+  packageVersion: 9.0.8
+  assetPath: Assets/Plugins/Dissonance/Core/Audio/Playback/BaseVoicePlayback.cs
+  uploadId: 811004
