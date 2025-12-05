@@ -193,6 +193,7 @@ GameObject:
   - component: {fileID: 127351458884395925}
   - component: {fileID: 5789242062561563126}
   - component: {fileID: 3839124227917426456}
+  - component: {fileID: 4286760008628237853}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -560,7 +561,6 @@ MonoBehaviour:
   broadcastTrigger: {fileID: 5710185885316243196}
   receiptTrigger: {fileID: 127351458884395925}
   voicePlayback: {fileID: 5789242062561563126}
-  playerInput: {fileID: 5453086930949067390}
 --- !u!114 &5710185885316243196
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -726,6 +726,18 @@ AudioSource:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
+--- !u!114 &4286760008628237853
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4617420574203757969}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 12031778f3aece14ab7ad71b5a5f310f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: DissonanceVoip::Dissonance.Audio.Playback.SamplePlaybackComponent
 --- !u!1 &4680196624574217665
 GameObject:
   m_ObjectHideFlags: 0
