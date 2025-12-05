@@ -12,7 +12,6 @@ public class MachineTaskManager : NetworkBehaviour
 
     private List<Task> tasks = new List<Task>();
     private NetworkVariable<int> activeTaskCount = new NetworkVariable<int>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
-    private bool wasActive = false;
 
     public int ActiveTaskCount => activeTaskCount.Value;
     public bool HasActiveTasks => activeTaskCount.Value > 0;

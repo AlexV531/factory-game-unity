@@ -24,13 +24,15 @@ public class GameTerminal : Interactable
     public string playerActionMapName = "Player";
     public string terminalActionMapName = "Look";
 
+    private NetworkVariable<bool> isTerminalActive = new NetworkVariable<bool>(false, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+    private NetworkVariable<ulong> activeClientId = new NetworkVariable<ulong>(0, NetworkVariableReadPermission.Everyone, NetworkVariableWritePermission.Server);
+
     private List<string> outputLines = new List<string>();
     private List<string> commandHistory = new List<string>();
     private int historyIndex = -1;
-    private bool isActive = false;
-    private ulong activeClientId;
     private Transform activePlayerTransform;
     private InputActionMap previousActionMap;
+    private bool hasControl = false;
 
     void Start()
     {
@@ -46,8 +48,96 @@ public class GameTerminal : Interactable
             terminalCanvas.gameObject.SetActive(false);
         }
 
+        // Subscribe to network variable changes
+        isTerminalActive.OnValueChanged += OnTerminalActiveChanged;
+        activeClientId.OnValueChanged += OnActiveClientChanged;
+
         AddSystemMessage("Terminal v1.0 - Type 'help' for commands");
         AddOutputLine("");
+    }
+
+    void OnTerminalActiveChanged(bool previousValue, bool newValue)
+    {
+        // Update canvas visibility for all clients
+        if (terminalCanvas != null)
+        {
+            terminalCanvas.gameObject.SetActive(newValue);
+        }
+
+        // Handle control setup for the active client
+        if (newValue && NetworkManager.Singleton.LocalClientId == activeClientId.Value)
+        {
+            SetupLocalControl();
+        }
+        else if (!newValue && hasControl)
+        {
+            ReleaseLocalControl();
+        }
+    }
+
+    void OnActiveClientChanged(ulong previousValue, ulong newValue)
+    {
+        // When the active client changes, check if we should have control
+        if (isTerminalActive.Value && NetworkManager.Singleton.LocalClientId == newValue)
+        {
+            SetupLocalControl();
+        }
+        else if (hasControl && NetworkManager.Singleton.LocalClientId != newValue)
+        {
+            ReleaseLocalControl();
+        }
+    }
+
+    void SetupLocalControl()
+    {
+        hasControl = true;
+
+        // Get local player transform
+        if (NetworkManager.Singleton != null)
+        {
+            var localClient = NetworkManager.Singleton.LocalClient;
+            if (localClient != null && localClient.PlayerObject != null)
+            {
+                activePlayerTransform = localClient.PlayerObject.transform;
+
+                // Switch to Look action map
+                var playerInput = localClient.PlayerObject.GetComponent<PlayerInput>();
+                if (playerInput != null)
+                {
+                    previousActionMap = playerInput.currentActionMap;
+                    playerInput.SwitchCurrentActionMap(terminalActionMapName);
+                }
+            }
+        }
+
+        if (inputField != null)
+        {
+            inputField.interactable = true;
+            inputField.text = "";
+            inputField.ActivateInputField();
+        }
+    }
+
+    void ReleaseLocalControl()
+    {
+        hasControl = false;
+
+        // Switch back to Player action map
+        if (activePlayerTransform != null)
+        {
+            var playerInput = activePlayerTransform.GetComponent<PlayerInput>();
+            if (playerInput != null)
+            {
+                playerInput.SwitchCurrentActionMap(playerActionMapName);
+            }
+        }
+
+        activePlayerTransform = null;
+
+        if (inputField != null)
+        {
+            inputField.interactable = false;
+        }
     }
 
     void DiagnoseMachine(string machineId)
@@ -143,29 +233,35 @@ public class GameTerminal : Interactable
 
     void Update()
     {
+        // Only run control logic if this client has control
+        if (!hasControl)
+        {
+            return;
+        }
+
         // Check if player is too far away
-        if (isActive && activePlayerTransform != null)
+        if (activePlayerTransform != null)
         {
             float distance = Vector3.Distance(transform.position, activePlayerTransform.position);
             if (distance > maxInteractionDistance)
             {
-                DeactivateTerminal();
+                RequestDeactivateTerminalServerRpc();
                 return;
             }
         }
 
-        if (isActive && Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
         {
-            DeactivateTerminal();
+            RequestDeactivateTerminalServerRpc();
         }
 
         // Keep input field focused
-        if (isActive && inputField != null && !inputField.isFocused)
+        if (inputField != null && !inputField.isFocused)
         {
             inputField.ActivateInputField();
         }
 
-        if (isActive && inputField != null && inputField.isFocused && Keyboard.current != null)
+        if (inputField != null && inputField.isFocused && Keyboard.current != null)
         {
             if (Keyboard.current.upArrowKey.wasPressedThisFrame)
             {
@@ -182,90 +278,39 @@ public class GameTerminal : Interactable
     {
         base.Interact(clientId);
 
-        if (!IsOwner && !IsServer)
+        // This is called via ServerRpc, so we're already on the server
+        if (!IsServer)
         {
-            if (NetworkManager.Singleton.LocalClientId != clientId)
-                return;
+            return;
         }
 
-        if (!isActive)
+        if (!isTerminalActive.Value)
         {
-            ActivateTerminal(clientId);
+            // Activate terminal for this client
+            activeClientId.Value = clientId;
+            isTerminalActive.Value = true;
         }
-        else
+        else if (activeClientId.Value == clientId)
         {
-            DeactivateTerminal();
+            // Same client interacting again, deactivate
+            isTerminalActive.Value = false;
         }
+        // If a different client tries to interact, do nothing (or you could show a message)
     }
 
-    void ActivateTerminal(ulong clientId)
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    void RequestDeactivateTerminalServerRpc()
     {
-        isActive = true;
-        activeClientId = clientId;
-
-        // Get the player transform from the clientId
-        if (NetworkManager.Singleton != null)
-        {
-            foreach (var client in NetworkManager.Singleton.ConnectedClientsList)
-            {
-                if (client.ClientId == clientId && client.PlayerObject != null)
-                {
-                    activePlayerTransform = client.PlayerObject.transform;
-
-                    // Switch to Look action map
-                    var playerInput = client.PlayerObject.GetComponent<PlayerInput>();
-                    if (playerInput != null)
-                    {
-                        previousActionMap = playerInput.currentActionMap;
-                        playerInput.SwitchCurrentActionMap(terminalActionMapName);
-                    }
-                    break;
-                }
-            }
-        }
-
-        if (terminalCanvas != null)
-        {
-            terminalCanvas.gameObject.SetActive(true);
-        }
-
-        if (inputField != null)
-        {
-            inputField.text = "";
-            inputField.ActivateInputField();
-        }
-
-        // Cursor.lockState = CursorLockMode.None;
-        // Cursor.visible = true;
-    }
-
-    void DeactivateTerminal()
-    {
-        isActive = false;
-
-        // Switch back to Player action map
-        if (NetworkManager.Singleton != null && activePlayerTransform != null)
-        {
-            var playerInput = activePlayerTransform.GetComponent<PlayerInput>();
-            if (playerInput != null)
-            {
-                playerInput.SwitchCurrentActionMap(playerActionMapName);
-            }
-        }
-
-        activePlayerTransform = null;
-
-        if (terminalCanvas != null)
-        {
-            terminalCanvas.gameObject.SetActive(false);
-        }
-
-        // Cursor.lockState = CursorLockMode.Locked;
-        // Cursor.visible = false;
+        isTerminalActive.Value = false;
     }
 
     void OnSubmit(string command)
     {
+        if (!hasControl)
+        {
+            return;
+        }
+
         if (string.IsNullOrWhiteSpace(command))
         {
             if (inputField != null)
@@ -273,22 +318,36 @@ public class GameTerminal : Interactable
             return;
         }
 
-        AddOutputLine($"> {command}");
-        commandHistory.Add(command);
-        historyIndex = commandHistory.Count;
-        ProcessCommand(command.Trim());
+        // Send command to server to process and broadcast
+        SubmitCommandServerRpc(command);
 
         if (inputField != null)
         {
             inputField.text = "";
             inputField.ActivateInputField();
         }
+    }
 
-        ScrollToBottom();
+    [Rpc(SendTo.Server, InvokePermission = RpcInvokePermission.Everyone)]
+    void SubmitCommandServerRpc(string command)
+    {
+        // Add to output and process on server
+        AddOutputLineClientRpc($"> {command}");
+
+        // Process command on server
+        ProcessCommand(command.Trim());
+
+        // Scroll to bottom for all clients
+        ScrollToBottomClientRpc();
     }
 
     void ProcessCommand(string command)
     {
+        if (!IsServer)
+        {
+            return;
+        }
+
         string[] parts = command.ToLower().Split(' ');
         string cmd = parts[0];
 
@@ -306,7 +365,7 @@ public class GameTerminal : Interactable
                 break;
 
             case "clear":
-                ClearOutput();
+                ClearOutputClientRpc();
                 break;
 
             case "echo":
@@ -344,7 +403,7 @@ public class GameTerminal : Interactable
 
             case "exit":
             case "quit":
-                DeactivateTerminal();
+                isTerminalActive.Value = false;
                 break;
 
             default:
@@ -416,7 +475,13 @@ public class GameTerminal : Interactable
         AddOutputLine("");
     }
 
-    public void AddOutputLine(string line)
+    [ClientRpc]
+    void AddOutputLineClientRpc(string line)
+    {
+        AddOutputLineLocal(line);
+    }
+
+    void AddOutputLineLocal(string line)
     {
         outputLines.Add(line);
 
@@ -426,6 +491,18 @@ public class GameTerminal : Interactable
         }
 
         UpdateOutputText();
+    }
+
+    public void AddOutputLine(string line)
+    {
+        if (IsServer)
+        {
+            AddOutputLineClientRpc(line);
+        }
+        else
+        {
+            AddOutputLineLocal(line);
+        }
     }
 
     public void AddSystemMessage(string message)
@@ -451,10 +528,19 @@ public class GameTerminal : Interactable
         }
     }
 
-    public void ClearOutput()
+    [ClientRpc]
+    void ClearOutputClientRpc()
     {
         outputLines.Clear();
         UpdateOutputText();
+    }
+
+    public void ClearOutput()
+    {
+        if (IsServer)
+        {
+            ClearOutputClientRpc();
+        }
     }
 
     void NavigateHistory(int direction)
@@ -475,6 +561,12 @@ public class GameTerminal : Interactable
         }
     }
 
+    [ClientRpc]
+    void ScrollToBottomClientRpc()
+    {
+        ScrollToBottom();
+    }
+
     void ScrollToBottom()
     {
         if (scrollRect != null)
@@ -486,7 +578,7 @@ public class GameTerminal : Interactable
 
     public bool IsActive()
     {
-        return isActive;
+        return isTerminalActive.Value;
     }
 
     void OnDrawGizmosSelected()
@@ -494,5 +586,20 @@ public class GameTerminal : Interactable
         // Draw interaction distance sphere
         Gizmos.color = Color.yellow;
         Gizmos.DrawWireSphere(transform.position, maxInteractionDistance);
+    }
+
+    public override void OnDestroy()
+    {
+        base.OnDestroy();
+
+        if (isTerminalActive != null)
+        {
+            isTerminalActive.OnValueChanged -= OnTerminalActiveChanged;
+        }
+
+        if (activeClientId != null)
+        {
+            activeClientId.OnValueChanged -= OnActiveClientChanged;
+        }
     }
 }

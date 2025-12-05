@@ -4,7 +4,6 @@ using Dissonance;
 public class DissonanceNetcodeSetup : MonoBehaviour
 {
     [SerializeField] private DissonanceComms dissonanceComms;
-    [SerializeField] private string roomName = "ProximityRoom";
 
     private static DissonanceNetcodeSetup instance;
 
