@@ -216,9 +216,9 @@ MonoBehaviour:
   RotationInterpolationType: 0
   ScaleInterpolationType: 0
   PositionLerpSmoothing: 1
-  PositionMaxInterpolationTime: 0.04
+  PositionMaxInterpolationTime: 0.06
   RotationLerpSmoothing: 1
-  RotationMaxInterpolationTime: 0.04
+  RotationMaxInterpolationTime: 0.06
   ScaleLerpSmoothing: 1
   ScaleMaxInterpolationTime: 0.1
   AuthorityMode: 0
@@ -506,7 +506,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VehicleController
   ShowTopMostFoldoutHeaderGroup: 1
-  motorForce: 18
+  requiresSustainedInteraction: 0
+  motorForce: 16
   turnSpeed: 160
   maxSpeed: 4
   minTurnSpeedFactor: 0.7
